@@ -1,0 +1,77 @@
+<html ng-app="demo">
+<head>
+  <title title>NgCrop Example</title>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="samplestyles.css">
+  <script src="../bower_components/angular/angular.min.js"></script>
+  <script src="../bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+  <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <script src="../dist/unminified/ngcrop.js"></script>
+  <script type="text/javascript">
+    var app = angular.module('demo', ['ngcrop']);
+    app
+      .controller('ngcropDemoController', function($scope) {
+        $scope.origImageFile = undefined;
+        $scope.isReadyForCrop = false;
+        $scope.croppedImageDataUrl = undefined;
+
+        var image = new Image();
+        image.onload = function(){
+
+          $scope.origImageFile = this;
+
+          $scope.$apply(function(){
+
+            $scope.isReadyForCrop = true;
+
+          });
+
+        };
+        image.src = 'testimage.jpeg';
+
+        $scope.crop = function(){
+
+          $scope.isReadyForCrop = false;
+
+        }
+
+        $scope.revertCrop = function(){
+
+          $scope.isReadyForCrop = true;
+
+        }
+
+      })
+  </script>
+</head>
+<body ng-controller="ngcropDemoController">
+<div>
+  <h2 style="text-align: center">Drag corners to expand and/or collapse or click and drag center to move entire square</h2>
+  <div>
+    <div style="text-align: center">
+      <crop-image data-ng-show="isReadyForCrop" canvas-style="canvas-border-style" selector-color="#FF0000" selector-line-width="2" cropped-img-data="croppedImageDataUrl" orig-image="origImageFile"></crop-image>
+      <img data-ng-src="{{croppedImageDataUrl}}" data-ng-show="!isReadyForCrop" height="200px" width="200px">
+    </div>
+    <div class="row" style="margin-top: 20px"></div>
+    <div class="row">
+      <div class="col-sm-2 col-sm-offset-5" data-ng-show="isReadyForCrop">
+        <button
+          on-tap
+          class="btn btn-deep-red btn-block"
+          data-ng-click="crop()">
+          Crop
+        </button>
+      </div>
+      <div class="col-sm-2 col-sm-offset-5" data-ng-show="!isReadyForCrop">
+        <button
+          on-tap
+          class="btn btn-deep-red btn-block"
+          data-ng-click="revertCrop()">
+          Revert
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
