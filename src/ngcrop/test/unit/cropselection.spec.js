@@ -1,13 +1,11 @@
 /**
  * Created by ltischuk on 2/15/15.
  */
-/**
- * Created by ltischuk on 9/27/14.
- */
 'use strict';
 describe('Factory: CropSelection', function() {
 
   var CropSelection;
+  var cropSelector;
 
   beforeEach(module('ngcrop'));
 
@@ -18,11 +16,26 @@ describe('Factory: CropSelection', function() {
   }));
 
   it("should instantiate a crop selection", function() {
+
     //Setup initialized data prior to cases
 
-    var cropSelector = new CropSelection();
-    //ensure that only uniquely named stepped views can be added and name must be a string
+    cropSelector = new CropSelection(200);
+    //ensure that crop selection is only
     expect(cropSelector.length).toEqual(0);
+
+  });
+
+  it("should set dimensions of crop selection to image", function() {
+
+    //Setup initialized data prior to cases
+
+    var img = new Image();
+    img.width = 400;
+    img.height = 600;
+    cropSelector = new CropSelection(200);
+    cropSelector.setSelectorDimensions(img);
+    expect(cropSelector.ratio).toEqual(200/600);
+
 
   });
 

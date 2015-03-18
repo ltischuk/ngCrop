@@ -4,6 +4,12 @@
 angular.module('ngcrop')
   .factory('CropSelection', function CropSelectionFactory(ngCropConstants) {
 
+    /**
+     * CropSelection
+     * A class to support the movement of a square selector on top of a canvas
+      * @param maxLength
+     * @constructor
+     */
     function CropSelection(maxLength){
 
       this._x = 0;
@@ -66,7 +72,7 @@ angular.module('ngcrop')
         return this._length/this._ratio;
 
       },
-      setScalesToImage : function(img){
+      setSelectorDimensions : function(img){
 
         var imgRatio = Math.min ((this._maxLength / img.width),(this._maxLength/ img.height));
         this._ratio = imgRatio > 1 ? 1 : imgRatio;

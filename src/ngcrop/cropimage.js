@@ -12,6 +12,7 @@ angular.module('ngcrop').directive('cropImage',
             origImage: '=',
             maxImgDisplayLength: '=',
             croppedImgData: '=',
+            croppedImgFormat: '@',
             canvasStyle: '@',
             selectorColor: '@',
             selectorLineWidth: '@'
@@ -19,9 +20,6 @@ angular.module('ngcrop').directive('cropImage',
           },
           template: '<canvas class="{{canvasStyle}}"></canvas>',
           link: function (scope, element, attrs) {
-
-            scope.selectorColor = angular.isDefined(scope.selectorColor) ? scope.selectorColor : '#ff0000';
-            scope.selectorLineWidth = angular.isDefined(scope.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
 
             var cvs = element.find('canvas');
             var canvasLength = angular.isDefined(scope.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
@@ -34,8 +32,12 @@ angular.module('ngcrop').directive('cropImage',
             var lastMouseY = 0;
             var mouseX = 0;
             var mouseY = 0;
+            scope.selectorColor = angular.isDefined(scope.selectorColor) ? scope.selectorColor : '#ff0000';
+            scope.selectorLineWidth = angular.isDefined(scope.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
+            scope.croppedImgFormat = 'image/' + (angular.isDefined(scope.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
 
-            //watch for changes on the image in the controller that contains the image
+
+              //watch for changes on the image in the controller that contains the image
             scope.$watch(function(scope) { return scope.origImage },
               function(newImage) {
 
@@ -50,6 +52,11 @@ angular.module('ngcrop').directive('cropImage',
                 }
               }
             );
+
+            function validateInputs(){
+
+
+            }
 
             /**
              * Method: drawImageOnCanvas
