@@ -132,7 +132,7 @@ angular.module('ngcrop')
 
       },
       /**
-       * Determine whether a given potential increment is allowed for X
+       * Determine whether a given potential increment can be applied to X
        * @param acc
        * @returns {boolean}
        * @private
@@ -146,11 +146,16 @@ angular.module('ngcrop')
         return true;
 
       },
+      /**
+       * Determine whether a given potential increment can be applied to Y
+       * @param acc
+       * @returns {boolean}
+       * @private
+       */
       _isValidYMove : function(acc){
 
         var tempY = acc + this._y;
-        if(tempY < this._outerCushion || tempY + this._length > this._maxY ||
-          (this._length - Math.abs(acc)) <= 0){
+        if(tempY < this._outerCushion || tempY + this._length > this._maxY){
           return false;
         }
         return true;
@@ -218,12 +223,12 @@ angular.module('ngcrop')
         }
 
       },
-      nearestCorner: function(mouseX, mouseY){
+      nearestCorner: function(pointX, pointY){
 
-        var pxFromXLeft = Math.abs(mouseX - this._x);
-        var pxFromXRight = Math.abs(mouseX - (this._x + this._length));
-        var pxFromYTop = Math.abs(mouseY - this._y);
-        var pxFromYBottom = Math.abs(mouseY - (this._y + this._length));
+        var pxFromXLeft = Math.abs(pointX - this._x);
+        var pxFromXRight = Math.abs(pointX - (this._x + this._length));
+        var pxFromYTop = Math.abs(pointY - this._y);
+        var pxFromYBottom = Math.abs(pointY - (this._y + this._length));
 
         var topLeft = pxFromXLeft + pxFromYTop;
         var topRight = pxFromXRight + pxFromYTop;
