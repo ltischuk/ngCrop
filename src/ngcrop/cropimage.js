@@ -19,7 +19,11 @@ angular.module('ngcrop').directive('cropImage',
 
           },
           template: '<canvas class="{{canvasStyle}}"></canvas>',
-          link: function (scope, element, attrs) {
+          link: function (scope, element) {
+
+            scope.selectorColor = angular.isDefined(scope.selectorColor) ? scope.selectorColor : '#ff0000';
+            scope.selectorLineWidth = angular.isDefined(scope.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
+            scope.croppedImgFormat = 'image/' + (angular.isDefined(scope.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
 
             var cvs = element.find('canvas');
             var canvasLength = angular.isDefined(scope.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
@@ -32,10 +36,6 @@ angular.module('ngcrop').directive('cropImage',
             var lastMouseY = 0;
             var mouseX = 0;
             var mouseY = 0;
-            scope.selectorColor = angular.isDefined(scope.selectorColor) ? scope.selectorColor : '#ff0000';
-            scope.selectorLineWidth = angular.isDefined(scope.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
-            scope.croppedImgFormat = 'image/' + (angular.isDefined(scope.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
-
 
               //watch for changes on the image in the controller that contains the image
             scope.$watch(function(scope) { return scope.origImage },
@@ -43,20 +43,15 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newImage)){
 
-                  selector.setScalesToImage(newImage);
-                  cvs[0].width = selector.scaledWidth;
-                  cvs[0].height = selector.scaledHeight;
+                  selector.setSelectorDimensions(newImage);
+                  cvs[0].width = selector.parentWidth;
+                  cvs[0].height = selector.parentHeight;
                   drawImageOnCanvas();
                   calibrateCroppedImageData();
 
                 }
               }
             );
-
-            function validateInputs(){
-
-
-            }
 
             /**
              * Method: drawImageOnCanvas
@@ -70,8 +65,8 @@ angular.module('ngcrop').directive('cropImage',
               var sY =  0;
               var sWidth =  scope.origImage.width;
               var sHeight =  scope.origImage.height;
-              var drawWidth = selector.scaledWidth;
-              var drawHeight = selector.scaledHeight;
+              var drawWidth = selector.parentWidth;
+              var drawHeight = selector.parentHeight;
 
               //draw the image to the canvas
               ctx.drawImage(scope.origImage,sX,sY,sWidth,sHeight,0,0,drawWidth,drawHeight);
@@ -88,7 +83,7 @@ angular.module('ngcrop').directive('cropImage',
             function calibrateCroppedImageData(){
 
               scope.croppedImgData = cropCanvas.getDataUrl(scope.origImage,
-                selector.scaledX, selector.scaledY, selector.scaledLength , selector.scaledWidth, selector.scaledHeight);
+                selector.scaledX, selector.scaledY, selector.scaledLength , selector.parentWidth, selector.parentHeight);
 
             }
 
@@ -130,7 +125,7 @@ angular.module('ngcrop').directive('cropImage',
 
               if (isSelecting) {
 
-                drawImageOnCanvas(false);
+                drawImageOnCanvas();
 
                 var xdiff = mouseX - lastMouseX;
                 var ydiff = mouseY - lastMouseY;
@@ -138,7 +133,7 @@ angular.module('ngcrop').directive('cropImage',
                 selector.move(xdiff, ydiff, moveCorner, corner);
                 lastMouseX = mouseX;
                 lastMouseY = mouseY;
-                drawImageOnCanvas(false);
+                drawImageOnCanvas();
               }
 
             }

@@ -15,17 +15,20 @@ angular.module('ngcrop')
       this._x = 0;
       this._y = 0;
       this._length = 0;
-      this._paddedPixels = 2;
+      this._outerCushion = 2;
       this._ratio = 1;
-      this._scaledWidth = 1;
-      this._scaledHeight = 1;
-      this._maxLength = maxLength;
+      this._parentWidth = 1;
+      this._parentHeight = 1;
+      this._maxAllowedLength = maxLength;
       this._maxX = 0;
       this._maxY = 0;
       this._currentCorner = 0;
 
     }
 
+      /**
+       * Prototype functions
+       **/
     CropSelection.prototype = {
 
       get x(){
@@ -48,14 +51,14 @@ angular.module('ngcrop')
         return this._ratio;
 
       },
-      get scaledWidth(){
+      get parentWidth(){
 
-        return this._scaledWidth;
+        return this._parentWidth;
 
       },
-      get scaledHeight(){
+      get parentHeight(){
 
-        return this._scaledHeight;
+        return this._parentHeight;
       },
 
       get scaledX(){
@@ -72,49 +75,81 @@ angular.module('ngcrop')
         return this._length/this._ratio;
 
       },
+      /**
+       * Set the selector
+       * @param img
+       */
       setSelectorDimensions : function(img){
 
-        var imgRatio = Math.min ((this._maxLength / img.width),(this._maxLength/ img.height));
+        //compute the ratio of the image to scale down to maxAllowedLength and set variables accordingly
+        var imgRatio = Math.min ((this._maxAllowedLength / img.width),(this._maxAllowedLength/ img.height));
         this._ratio = imgRatio > 1 ? 1 : imgRatio;
-        this._scaledWidth = img.width * this._ratio;
-        this._scaledHeight = img.height * this._ratio;
-        this._maxX = this._scaledWidth - this._paddedPixels;
-        this._maxY = this._scaledHeight - this._paddedPixels;
-        var dim = Math.min(this._scaledWidth,this._scaledHeight);
-        var qtrDim = dim/4;
-        this._x = (this._maxX / 2) - qtrDim;
-        this._y = qtrDim;
-        this._length = dim/2;
+        this._parentWidth = img.width * this._ratio;
+        this._parentHeight = img.height * this._ratio;
+        this._maxX = this._parentWidth - this._outerCushion;
+        this._maxY = this._parentHeight - this._outerCushion;
+
+        //position selector in the center of the parent canvas
+        var minLenValue = Math.min(this._parentWidth,this._parentHeight);
+        this._x = (this._maxX / 2) - (minLenValue/4);
+        this._y = (minLenValue/4);
+        this._length = minLenValue/2;
 
       },
+      /**
+       * Calculate whether or not the point is in the center move zone to move the entire selector in any direction
+       * @param pointX
+       * @param pointY
+       * @returns {boolean}
+       */
       isInMoveZone : function(pointX, pointY){
 
-        //a 6th of the square length from each side will
-        var partial = this._length /6;
-        var maxBound = this._length - partial;
-        if(pointX >= (this._x + partial) && pointX <= (this._x + maxBound) &&
-          pointY >= (this._y + partial) && pointY <= (this._y + maxBound)){
+        //find if point is in moveable territory and not in expandable/collapsable areas near corners
+        var moveZoneMinBound = this._length / 6;
+        var moveZoneMaxBound = this._length - moveZoneMinBound;
+        if(pointX >= (this._x + moveZoneMinBound) && pointX <= (this._x + moveZoneMaxBound) &&
+          pointY >= (this._y + moveZoneMinBound) && pointY <= (this._y + moveZoneMaxBound)){
 
           return true;
         }
         return false;
       },
-      _allowedLengthMove: function(acc){
-        if(this._x + (this._length + acc) > (this._maxX) || this._y + (this._length + acc) > (this._maxY) ||
-          this._length + acc < 0 ){
+      /**
+       * Determines whether a given potential increment is allowed for length
+       * @param acc
+       * @returns {boolean}
+       * @private
+       */
+      _isValidLengthMove: function(acc){
+
+        var tempLength = (this._length + acc);
+        if(this._x + tempLength > this._maxX || this._y + tempLength > this._maxY
+            || tempLength < 0){
           return false;
 
         }
         return true;
+
       },
-      _allowedXMove : function(acc){
-        if((acc + this._x) < this._paddedPixels || (this._x + acc + this._length) > this._maxX){
+      /**
+       * Determine whether a given potential increment is allowed for X
+       * @param acc
+       * @returns {boolean}
+       * @private
+       */
+      _isValidXMove : function(acc){
+
+        var tempX = acc + this._x;
+        if(tempX < this._outerCushion || tempX + this._length > this._maxX){
           return false;
         }
         return true;
+
       },
-      _allowedYMove : function(acc){
-        if((acc + this._y) < this._paddedPixels || (this._y + acc + this._length) > this._maxY ||
+      _isValidYMove : function(acc){
+
+        var tempY = acc + this._y;
+        if(tempY < this._outerCushion || tempY + this._length > this._maxY ||
           (this._length - Math.abs(acc)) <= 0){
           return false;
         }
@@ -124,7 +159,7 @@ angular.module('ngcrop')
 
         if(isCorner){
 
-          //expand or collapse selector square depending on movement and which corner
+          //expand or collapse selector square depending on movement and corner
           var move = 0;
           var len = 0;
 
@@ -137,8 +172,8 @@ angular.module('ngcrop')
 
                 move = Math.max(xMove, yMove) > 0 ? Math.max(xMove, yMove) : Math.min(xMove, yMove);
                 len = -(move * 2);
-                this._x = this._allowedXMove(move) ? this._x + move : this._x;
-                this._y = this._allowedYMove(move) ? this._y + move : this._y;
+                this._x = this._isValidXMove(move) ? this._x + move : this._x;
+                this._y = this._isValidXMove(move) ? this._y + move : this._y;
                 break;
 
               }
@@ -148,8 +183,8 @@ angular.module('ngcrop')
                 var moveRight = (xMove > 0 || yMove < 0);
                 move = Math.max(Math.abs(xMove),Math.abs(yMove));
                 len = moveRight ? (move * 2) : -(move *2);
-                this._x = moveRight && this._allowedXMove(-move) ? this._x - move : this._allowedXMove(move) ?  this._x + move : this._x ;
-                this._y = moveRight && this._allowedYMove(-move) ? this._y - move : this._allowedYMove(move) ? this._y + move : this._y;
+                this._x = moveRight && this._isValidXMove(-move) ? this._x - move : this._isValidXMove(move) ?  this._x + move : this._x ;
+                this._y = moveRight && this._isValidYMove(-move) ? this._y - move : this._isValidYMove(move) ? this._y + move : this._y;
                 break;
               }
               case ngCropConstants.POSITIONS.BOTTOM_LEFT:
@@ -158,8 +193,8 @@ angular.module('ngcrop')
                 var moveLeft = (xMove < 0 || yMove > 0);
                 move = Math.max(Math.abs(xMove),Math.abs(yMove));
                 len = moveLeft ? (move * 2) : -(move *2);
-                this._x = (moveLeft && this._allowedXMove(-move)) ? this._x - move : this._allowedXMove(move) ?  this._x + move : this._x ;
-                this._y = (moveLeft && this._allowedYMove(-move)) ? this._y - move : this._allowedYMove(move) ? this._y + move : this._y;
+                this._x = (moveLeft && this._isValidXMove(-move)) ? this._x - move : this._isValidXMove(move) ?  this._x + move : this._x ;
+                this._y = (moveLeft && this._isValidYMove(-move)) ? this._y - move : this._isValidYMove(move) ? this._y + move : this._y;
                 break;
               }
               default:
@@ -167,19 +202,19 @@ angular.module('ngcrop')
 
                 move = Math.max(xMove, yMove) > 0 ? Math.max(xMove, yMove) : Math.min(xMove, yMove);
                 len = move * 2;
-                this._x = this._allowedXMove(-move) ? this._x - move : this._x;
-                this._y = this._allowedYMove(-move) ? this._y - move : this._y;
+                this._x = this._isValidXMove(-move) ? this._x - move : this._x;
+                this._y = this._isValidYMove(-move) ? this._y - move : this._y;
                 break;
 
               }
             }
-            this._length = (this._allowedLengthMove(len) ? (this._length + len) : this._length);
+            this._length = (this._isValidLengthMove(len) ? (this._length + len) : this._length);
           }
 
         }else{
           //move entire selector square
-          this._x = this._allowedXMove(xMove) ? this._x + xMove : this._x;
-          this._y = this._allowedYMove(yMove) ? this._y + yMove : this._y;
+          this._x = this._isValidXMove(xMove) ? this._x + xMove : this._x;
+          this._y = this._isValidYMove(yMove) ? this._y + yMove : this._y;
         }
 
       },
