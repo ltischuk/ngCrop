@@ -114,6 +114,16 @@ angular.module('ngcrop')
         }
         return false;
       },
+      _isValidCornerMove : function( acc,lenAcc){
+
+        var newX = acc + this._x;
+        var newY = acc + this._y;
+        var newLen = this._length + lenAcc;
+        return (newX >= this._outerCushion && (newX + newLen) < this._maxX &&
+                newY >= this._outerCushion && (newY + newLen) < this._maxY &&
+                newLen > 10);
+
+      },
       /**
        * Determines whether a given potential increment is allowed for length
        * @param acc
@@ -168,7 +178,6 @@ angular.module('ngcrop')
           var movingUp = yMove < 0 ? true: false;
           var movingLeft = xMove < 0 ? true : false;
           var movingDown = yMove > 0 ? true : false;
-          var movingRight = xMove > 0 ? true : false;
           var moveAdj = Math.max(Math.abs(xMove),Math.abs(yMove));
           var lenAdj = moveAdj * 2;
 
@@ -210,7 +219,7 @@ angular.module('ngcrop')
               }
             }
 
-            if( this._isValidXMove(moveAdj) && this._isValidYMove(moveAdj) && this._isValidLengthMove(lenAdj)){
+            if(this._isValidCornerMove(moveAdj,lenAdj)){
               this._x += moveAdj;
               this._y += moveAdj;
               this._length += lenAdj;
