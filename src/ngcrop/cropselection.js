@@ -105,7 +105,7 @@ angular.module('ngcrop')
       isInMoveZone : function(pointX, pointY){
 
         //find if point is in moveable territory and not in expandable/collapsable areas near corners
-        var moveZoneMinBound = this._length / 6;
+        var moveZoneMinBound = this._length / 5;
         var moveZoneMaxBound = this._length - moveZoneMinBound;
         if(pointX >= (this._x + moveZoneMinBound) && pointX <= (this._x + moveZoneMaxBound) &&
           pointY >= (this._y + moveZoneMinBound) && pointY <= (this._y + moveZoneMaxBound)){
@@ -124,7 +124,7 @@ angular.module('ngcrop')
 
         var tempLength = (this._length + acc);
         if(this._x + tempLength > this._maxX || this._y + tempLength > this._maxY
-            || tempLength < 0){
+            || tempLength < this._outerCushion){
           return false;
 
         }
@@ -165,8 +165,12 @@ angular.module('ngcrop')
         if(isCorner){
 
           //expand or collapse selector square depending on movement and corner
-          var move = 0;
-          var len = 0;
+          var movingUp = yMove < 0 ? true: false;
+          var movingLeft = xMove < 0 ? true : false;
+          var movingDown = yMove > 0 ? true : false;
+          var movingRight = xMove > 0 ? true : false;
+          var moveAdj = Math.max(Math.abs(xMove),Math.abs(yMove));
+          var lenAdj = moveAdj * 2;
 
           if(this._currentCorner == cornerPosition){
 
@@ -175,45 +179,39 @@ angular.module('ngcrop')
               case ngCropConstants.POSITIONS.TOP_LEFT:
               {
 
-                move = Math.max(xMove, yMove) > 0 ? Math.max(xMove, yMove) : Math.min(xMove, yMove);
-                len = -(move * 2);
-                this._x = this._isValidXMove(move) ? this._x + move : this._x;
-                this._y = this._isValidXMove(move) ? this._y + move : this._y;
+                lenAdj *= movingLeft || movingUp ? 1 : -1;
+                moveAdj *= movingLeft || movingUp ? -1 : 1;
                 break;
 
               }
               case ngCropConstants.POSITIONS.TOP_RIGHT:
               {
 
-                var moveRight = (xMove > 0 || yMove < 0);
-                move = Math.max(Math.abs(xMove),Math.abs(yMove));
-                len = moveRight ? (move * 2) : -(move *2);
-                this._x = moveRight && this._isValidXMove(-move) ? this._x - move : this._isValidXMove(move) ?  this._x + move : this._x ;
-                this._y = moveRight && this._isValidYMove(-move) ? this._y - move : this._isValidYMove(move) ? this._y + move : this._y;
+                lenAdj *=  (movingRight && (movingUp || !movingDown)) ? 1 : (movingLeft && (movingDown || !movingUp)) ? -1 : 0 ;
+                moveAdj *=  (movingRight && (movingUp || !movingDown)) ? -1 : (movingLeft && (movingDown || !movingUp)) ? 1 : 0 ;
+                //console.log('ymove: ' + yMove + 'xMove: ' + xMove + ' movingLeft: ' + movingLeft + ' movingUp ' + movingUp + ' moveAdj ' + moveAdj + 'lenadj ' + lenAdj);
                 break;
+
               }
               case ngCropConstants.POSITIONS.BOTTOM_LEFT:
               {
 
-                var moveLeft = (xMove < 0 || yMove > 0);
-                move = Math.max(Math.abs(xMove),Math.abs(yMove));
-                len = moveLeft ? (move * 2) : -(move *2);
-                this._x = (moveLeft && this._isValidXMove(-move)) ? this._x - move : this._isValidXMove(move) ?  this._x + move : this._x ;
-                this._y = (moveLeft && this._isValidYMove(-move)) ? this._y - move : this._isValidYMove(move) ? this._y + move : this._y;
+                lenAdj *=  (movingRight && (movingUp || (!movingDown && !movingUp))) ? -1 : (movingLeft && (movingDown || (!movingDown && !movingUp))) ? 1 : 0 ;
+                moveAdj *=  (movingRight && (movingUp || (!movingDown && !movingUp))) ? 1 : (movingLeft && (movingDown || (!movingDown && !movingUp))) ? -1 : 0 ;
                 break;
               }
               default:
               {
 
-                move = Math.max(xMove, yMove) > 0 ? Math.max(xMove, yMove) : Math.min(xMove, yMove);
-                len = move * 2;
-                this._x = this._isValidXMove(-move) ? this._x - move : this._x;
-                this._y = this._isValidYMove(-move) ? this._y - move : this._y;
+                lenAdj *= movingLeft || movingUp ? -1 : 1;
+                moveAdj *= movingLeft || movingUp ? 1 : -1;
                 break;
 
               }
             }
-            this._length = (this._isValidLengthMove(len) ? (this._length + len) : this._length);
+            this._x = this._isValidXMove(moveAdj) ? this._x + moveAdj : this._x;
+            this._y = this._isValidYMove(moveAdj) ? this._y + moveAdj : this._y;
+            this._length = (this._isValidLengthMove(lenAdj) ? (this._length + lenAdj) : this._length);
           }
 
         }else{
