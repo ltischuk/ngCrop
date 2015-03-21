@@ -196,8 +196,8 @@ angular.module('ngcrop')
               case ngCropConstants.POSITIONS.BOTTOM_LEFT:
               {
 
-                lenAdj *=  (movingRight && (movingUp || (!movingDown && !movingUp))) ? -1 : (movingLeft && (movingDown || (!movingDown && !movingUp))) ? 1 : 0 ;
-                moveAdj *=  (movingRight && (movingUp || (!movingDown && !movingUp))) ? 1 : (movingLeft && (movingDown || (!movingDown && !movingUp))) ? -1 : 0 ;
+                lenAdj *=  movingDown || movingLeft ? 1 : -1;
+                moveAdj *=  movingDown || movingLeft ? -1 : 1;
                 break;
               }
               default:
@@ -215,9 +215,6 @@ angular.module('ngcrop')
               this._y += moveAdj;
               this._length += lenAdj;
             }
-           // this._x = this._isValidXMove(moveAdj) ? this._x + moveAdj : this._x;
-           // this._y = this._isValidYMove(moveAdj) ? this._y + moveAdj : this._y;
-           // this._length = (this._isValidLengthMove(lenAdj) ? (this._length + lenAdj) : this._length);
           }
 
         }else{
