@@ -124,7 +124,7 @@ angular.module('ngcrop')
 
         var tempLength = (this._length + acc);
         if(this._x + tempLength > this._maxX || this._y + tempLength > this._maxY
-            || tempLength < this._outerCushion){
+            || tempLength < 10){
           return false;
 
         }
@@ -187,8 +187,8 @@ angular.module('ngcrop')
               case ngCropConstants.POSITIONS.TOP_RIGHT:
               {
 
-                lenAdj *=  (movingRight && (movingUp || !movingDown)) ? 1 : (movingLeft && (movingDown || !movingUp)) ? -1 : 0 ;
-                moveAdj *=  (movingRight && (movingUp || !movingDown)) ? -1 : (movingLeft && (movingDown || !movingUp)) ? 1 : 0 ;
+                lenAdj *=  movingDown || movingLeft ? -1 : 1;
+                moveAdj *=  movingDown || movingLeft ? 1 : -1;
                 //console.log('ymove: ' + yMove + 'xMove: ' + xMove + ' movingLeft: ' + movingLeft + ' movingUp ' + movingUp + ' moveAdj ' + moveAdj + 'lenadj ' + lenAdj);
                 break;
 
@@ -209,9 +209,15 @@ angular.module('ngcrop')
 
               }
             }
-            this._x = this._isValidXMove(moveAdj) ? this._x + moveAdj : this._x;
-            this._y = this._isValidYMove(moveAdj) ? this._y + moveAdj : this._y;
-            this._length = (this._isValidLengthMove(lenAdj) ? (this._length + lenAdj) : this._length);
+
+            if( this._isValidXMove(moveAdj) && this._isValidYMove(moveAdj) && this._isValidLengthMove(lenAdj)){
+              this._x += moveAdj;
+              this._y += moveAdj;
+              this._length += lenAdj;
+            }
+           // this._x = this._isValidXMove(moveAdj) ? this._x + moveAdj : this._x;
+           // this._y = this._isValidYMove(moveAdj) ? this._y + moveAdj : this._y;
+           // this._length = (this._isValidLengthMove(lenAdj) ? (this._length + lenAdj) : this._length);
           }
 
         }else{
