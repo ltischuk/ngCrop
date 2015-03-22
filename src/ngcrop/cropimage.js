@@ -36,6 +36,7 @@ angular.module('ngcrop').directive('cropImage',
             var lastMouseY = 0;
             var mouseX = 0;
             var mouseY = 0;
+            var corner = 0;
 
               //watch for changes on the image in the controller that contains the image
             scope.$watch(function(scope) { return scope.origImage },
@@ -99,19 +100,6 @@ angular.module('ngcrop').directive('cropImage',
               lastMouseY = mouseY;
               isSelecting = true;
               selector.setCurrentCorner(mouseX, mouseY);
-
-            }
-
-            /**
-             * Handles the even for mouse move on the main canvas
-             * @param e
-             */
-            function handleMouseMove(e){
-
-              var corner = 0;
-              mouseX = e.offsetX;
-              mouseY = e.offsetY;
-
               if(selector.isInMoveZone(mouseX, mouseY)){
                 cvs[0].style.cursor = 'move';
                 moveCorner = false;
@@ -123,8 +111,30 @@ angular.module('ngcrop').directive('cropImage',
 
               }
 
-              if (isSelecting) {
+            }
 
+            /**
+             * Handles the even for mouse move on the main canvas
+             * @param e
+             */
+            function handleMouseMove(e){
+
+              mouseX = e.offsetX;
+              mouseY = e.offsetY;
+
+              if(!isSelecting){
+
+                if(selector.isInMoveZone(mouseX, mouseY)){
+                  cvs[0].style.cursor = 'move';
+                }
+                else{
+
+                  cvs[0].style.cursor = 'crosshair';
+                  moveCorner = true;
+
+                }
+
+              }else{
                 drawImageOnCanvas();
 
                 var xdiff = mouseX - lastMouseX;
