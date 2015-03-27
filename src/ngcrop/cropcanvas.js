@@ -103,7 +103,7 @@ angular.module('ngcrop')
       }
 
       /**
-       * Handles mouseUp (or mouseOut) event on the main canvas
+       * Handles event handlers to the canvas variable
        * @param e
        */
       CropCanvas.prototype.handleMouseUp = function(e){
