@@ -17,7 +17,7 @@ function runTests (singleRun, done) {
   });
 
   var testFiles = bowerDeps.js.concat([
-    paths.src + '/ngcrop/**/*.js'
+    paths.src + '/ngcrop/test/**/*.js'
   ]);
 
   gulp.src(testFiles)

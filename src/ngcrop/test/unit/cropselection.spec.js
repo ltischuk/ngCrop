@@ -19,22 +19,20 @@ describe('Factory: CropSelection', function() {
 
     //Setup initialized data prior to cases
 
-    cropSelector = new CropSelection(200);
+    cropSelector = new CropSelection();
     //ensure that crop selection is only
     expect(cropSelector.length).toEqual(0);
 
   });
 
-  it("should set dimensions of crop selection to image", function() {
+  it("should set initial dimensions of crop selection to parent width and height", function() {
 
     //Setup initialized data prior to cases
-
-   // var img = new Image();
-   // img.width = 400;
-   // img.height = 600;
-   // cropSelector = new CropSelection(200);
-   // cropSelector.initSelectorDimensions(img);
-   // expect(cropSelector.ratio).toEqual(200/600);
+    cropSelector = new CropSelection();
+    cropSelector.initSelectorDimensions(200,300);
+    expect(cropSelector.x).toEqual(49);
+    expect(cropSelector.y).toEqual(50);
+    expect(cropSelector.length).toEqual(100);
 
 
   });
