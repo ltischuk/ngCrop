@@ -4,7 +4,6 @@
 'use strict';
 describe('Directive: CropImage', function() {
 
-  var CropSelection;
   var CropCanvas;
     var $compile;
     var $rootScope;
@@ -12,9 +11,8 @@ describe('Directive: CropImage', function() {
 
   beforeEach(module('ngcrop'));
 
-  beforeEach(inject(function (_CropSelection_, _CropCanvas_, _$compile_, _$rootScope_) {
+  beforeEach(inject(function ( _CropCanvas_, _$compile_, _$rootScope_) {
 
-    CropSelection = _CropSelection_;
     CropCanvas = _CropCanvas_;
       $compile = _$compile_;
       $rootScope = _$rootScope_;

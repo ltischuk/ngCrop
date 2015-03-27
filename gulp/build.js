@@ -14,7 +14,8 @@ gulp.task('scripts', function(){
     paths.src + '/ngcrop/ngcrop.js',
     paths.src + '/ngcrop/cropcanvas.js',
     paths.src + '/ngcrop/cropselection.js',
-    paths.src + '/ngcrop/cropimage.js'
+    paths.src + '/ngcrop/cropimage.js',
+    paths.src + '/ngcrop/resultcanvas.js'
   ])
     .pipe($.concat('ngcrop.js'))
     .pipe(gulp.dest(paths.dist + '/unminified/'));

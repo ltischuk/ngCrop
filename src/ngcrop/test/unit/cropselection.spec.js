@@ -29,12 +29,12 @@ describe('Factory: CropSelection', function() {
 
     //Setup initialized data prior to cases
 
-    var img = new Image();
-    img.width = 400;
-    img.height = 600;
-    cropSelector = new CropSelection(200);
-    cropSelector.setSelectorDimensions(img);
-    expect(cropSelector.ratio).toEqual(200/600);
+   // var img = new Image();
+   // img.width = 400;
+   // img.height = 600;
+   // cropSelector = new CropSelection(200);
+   // cropSelector.initSelectorDimensions(img);
+   // expect(cropSelector.ratio).toEqual(200/600);
 
 
   });

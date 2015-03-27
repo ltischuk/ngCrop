@@ -10,16 +10,12 @@ angular.module('ngcrop')
       * @param maxLength
      * @constructor
      */
-    function CropSelection(maxLength){
+    function CropSelection(){
 
       this._x = 0;
       this._y = 0;
       this._length = 0;
       this._outerCushion = 2;
-      this._ratio = 1;
-      this._parentWidth = 1;
-      this._parentHeight = 1;
-      this._maxAllowedLength = maxLength;
       this._maxX = 0;
       this._maxY = 0;
       this._currentCorner = 0;
@@ -46,51 +42,17 @@ angular.module('ngcrop')
         return this._length;
 
       },
-      get ratio(){
-
-        return this._ratio;
-
-      },
-      get parentWidth(){
-
-        return this._parentWidth;
-
-      },
-      get parentHeight(){
-
-        return this._parentHeight;
-      },
-
-      get scaledX(){
-
-        return this._x/this._ratio;
-      },
-      get scaledY(){
-
-        return this._y/this._ratio;
-
-      },
-      get scaledLength(){
-
-        return this._length/this._ratio;
-
-      },
       /**
        * Set the selector
        * @param img
        */
-      setSelectorDimensions : function(img){
+      initSelectorDimensions : function(parentWidth, parentHeight){
 
-        //compute the ratio of the image to scale down to maxAllowedLength and set variables accordingly
-        var imgRatio = Math.min ((this._maxAllowedLength / img.width),(this._maxAllowedLength/ img.height));
-        this._ratio = imgRatio > 1 ? 1 : imgRatio;
-        this._parentWidth = img.width * this._ratio;
-        this._parentHeight = img.height * this._ratio;
-        this._maxX = this._parentWidth - this._outerCushion;
-        this._maxY = this._parentHeight - this._outerCushion;
+        this._maxX = parentWidth - this._outerCushion;
+        this._maxY = parentHeight - this._outerCushion;
 
         //position selector in the center of the parent canvas
-        var minLenValue = Math.min(this._parentWidth,this._parentHeight);
+        var minLenValue = Math.min(parentWidth, parentHeight);
         this._x = (this._maxX / 2) - (minLenValue/4);
         this._y = (minLenValue/4);
         this._length = minLenValue/2;
@@ -198,7 +160,6 @@ angular.module('ngcrop')
 
                 lenAdj *=  movingDown || movingLeft ? -1 : 1;
                 moveAdj *=  movingDown || movingLeft ? 1 : -1;
-                //console.log('ymove: ' + yMove + 'xMove: ' + xMove + ' movingLeft: ' + movingLeft + ' movingUp ' + movingUp + ' moveAdj ' + moveAdj + 'lenadj ' + lenAdj);
                 break;
 
               }
