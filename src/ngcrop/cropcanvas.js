@@ -8,14 +8,14 @@ angular.module('ngcrop')
          ResultCanvas)
     {
 
-      var isSelecting = false;
-      var moveCorner = false;
-      var lastMouseX = 0;
-      var lastMouseY = 0;
-      var mouseX = 0;
-      var mouseY = 0;
-      var corner = 0;
-
+      /**
+       * Class to control the crop canvas which controls the main canvas and
+       * @param canvasElement
+       * @param maxLength
+       * @param selectorWidth
+       * @param selectorColor
+       * @constructor
+       */
       function CropCanvas(canvasElement, maxLength, selectorWidth, selectorColor){
 
         this._canvas = canvasElement;
@@ -28,6 +28,13 @@ angular.module('ngcrop')
         this._imgScale = 1;
         this.currentImg = undefined;
         this.onDrawResult = undefined;
+        this._isSelecting = false;
+        this._moveCorner = false;
+        this._lastMouseX = 0;
+        this._lastMouseY = 0;
+        this._mouseX = 0;
+        this._mouseY = 0;
+        this._corner = 0;
         this.addEventHandlers();
 
       }
@@ -42,22 +49,22 @@ angular.module('ngcrop')
        */
       CropCanvas.prototype.handleMouseDown = function(e){
 
-        mouseX = e.offsetX;
-        mouseY = e.offsetY;
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
-        isSelecting = true;
-        this._cropSelector.setCurrentCorner(mouseX, mouseY);
-        if(this._cropSelector.isInMoveZone(mouseX, mouseY)){
+        this._mouseX = e.offsetX;
+        this._mouseY = e.offsetY;
+        this._lastMouseX = this._mouseX;
+        this._lastMouseY = this._mouseY;
+        this._isSelecting = true;
+        this._cropSelector.setCurrentCorner(this._mouseX, this._mouseY);
+        if(this._cropSelector.isInMoveZone(this._mouseX, this._mouseY)){
 
           this._canvas[0].style.cursor = 'move';
-          moveCorner = false;
+          this._moveCorner = false;
 
         }
         else{
           this._canvas[0].style.cursor = 'crosshair';
-          corner = this._cropSelector.nearestCorner(mouseX, mouseY);
-          moveCorner = true;
+          this._corner = this._cropSelector.nearestCorner(this._mouseX, this._mouseY);
+          this._moveCorner = true;
 
         }
 
@@ -69,30 +76,30 @@ angular.module('ngcrop')
        */
       CropCanvas.prototype.handleMouseMove = function(e){
 
-        mouseX = e.offsetX;
-        mouseY = e.offsetY;
+        this._mouseX = e.offsetX;
+        this._mouseY = e.offsetY;
 
-        if(!isSelecting){
+        if(!this._isSelecting){
 
-          if(this._cropSelector.isInMoveZone(mouseX, mouseY)){
+          if(this._cropSelector.isInMoveZone(this._mouseX, this._mouseY)){
             this._canvas[0].style.cursor = 'move';
           }
           else{
 
             this._canvas[0].style.cursor = 'crosshair';
-            moveCorner = true;
+            this._moveCorner = true;
 
           }
 
         }else{
           this.drawImageOnCanvas();
 
-          var xdiff = mouseX - lastMouseX;
-          var ydiff = mouseY - lastMouseY;
+          var xdiff = this._mouseX - this._lastMouseX;
+          var ydiff = this._mouseY - this._lastMouseY;
 
-          this._cropSelector.move(xdiff, ydiff, moveCorner, corner);
-          lastMouseX = mouseX;
-          lastMouseY = mouseY;
+          this._cropSelector.move(xdiff, ydiff, this._moveCorner, this._corner);
+          this._lastMouseX = this._mouseX;
+          this._lastMouseY = this._mouseY;
           this.drawImageOnCanvas();
         }
 
@@ -103,8 +110,8 @@ angular.module('ngcrop')
        * @param e
        */
       CropCanvas.prototype.handleMouseUp = function(e){
-        isSelecting = false;
-        moveCorner = false;
+        this._isSelecting = false;
+        this._moveCorner = false;
         this.drawImageOnCanvas();
         this._canvas[0].style.cursor = 'default';
         this.getCroppedImageData();
