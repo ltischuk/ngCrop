@@ -27,6 +27,7 @@ angular.module('ngcrop')
        **/
     CropSelection.prototype = {
 
+      //getters for x, y and length for public use
       get x(){
 
         return this._x;
@@ -43,7 +44,7 @@ angular.module('ngcrop')
 
       },
       /**
-       * Set the selector
+       * Set the selector dimensions given a new canvas (parent) width and height
        * @param img
        */
       initSelectorDimensions : function(parentWidth, parentHeight){
@@ -76,11 +77,18 @@ angular.module('ngcrop')
         }
         return false;
       },
-      _isValidCornerMove : function( acc,lenAcc){
+      /**
+       * isValidCornerMove - checks if the move is valid given an increment for x and y and length increment
+       * @param increment for x and y
+       * @param lenIncrement for the length
+       * @returns {boolean}
+       * @private
+       */
+      _isValidCornerMove : function( increment,lenIncrement){
 
-        var newX = acc + this._x;
-        var newY = acc + this._y;
-        var newLen = this._length + lenAcc;
+        var newX = increment + this._x;
+        var newY = increment + this._y;
+        var newLen = this._length + lenIncrement;
         return (newX >= this._outerCushion && (newX + newLen) < this._maxX &&
                 newY >= this._outerCushion && (newY + newLen) < this._maxY &&
                 newLen > 10);
@@ -132,6 +140,13 @@ angular.module('ngcrop')
         }
         return true;
       },
+      /**
+       * Move the selector x, y coordinates given a move increment and compute new length if necessary
+       * @param xMove
+       * @param yMove
+       * @param isCorner
+       * @param cornerPosition
+       */
       move : function(xMove,yMove, isCorner, cornerPosition){
 
         if(isCorner){
@@ -194,6 +209,12 @@ angular.module('ngcrop')
         }
 
       },
+      /**
+       * Find nearest corner given a point on the canvas
+       * @param pointX
+       * @param pointY
+       * @returns {number}
+       */
       nearestCorner: function(pointX, pointY){
 
         var pxFromXLeft = Math.abs(pointX - this._x);

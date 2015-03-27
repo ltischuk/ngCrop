@@ -20,16 +20,19 @@ angular.module('ngcrop').directive('cropImage',
           template: '<canvas class="{{canvasStyle}}"></canvas>',
           link: function (scope, element) {
 
+            // variables assess and set accordingly
             scope.selectorColor = angular.isDefined(scope.selectorColor) ? scope.selectorColor : '#ff0000';
             scope.selectorLineWidth = angular.isDefined(scope.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
             scope.croppedImgFormat = 'image/' + (angular.isDefined(scope.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
-
             var canvasLength = angular.isDefined(scope.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
-            var cvs = element.find('canvas');
-            var cropCanvas = new CropCanvas(cvs,canvasLength, scope.selectorLineWidth, scope.selectorColor);
-            cropCanvas.setResultCanvasDataFormat(scope.croppedImgFormat);
 
-              //watch for changes on the image in the controller that contains the image
+            //find canvas element on DOM
+            var cvs = element.find('canvas');
+
+            //create a new instance of the CropCanvas
+            var cropCanvas = new CropCanvas(cvs,canvasLength, scope.selectorLineWidth, scope.selectorColor, scope.croppedImgFormat);
+
+            //watch for changes on the main original image in the controller that contains the image (uploads of new images, etc.)
             scope.$watch(function(scope) { return scope.origImage },
               function(newImage) {
 
@@ -41,6 +44,10 @@ angular.module('ngcrop').directive('cropImage',
               }
             );
 
+            /**
+             * Callback to call each time a new cropped image result is obtained
+             * @param imageData
+             */
             function onCropResult(imageData){
 
               scope.croppedImgData = imageData;
@@ -48,6 +55,9 @@ angular.module('ngcrop').directive('cropImage',
             }
 
 
+            /**
+             * Remove all DOM elements once destroyed
+             */
             scope.$on('$destroy', function() {
 
               cropCanvas.destroy();

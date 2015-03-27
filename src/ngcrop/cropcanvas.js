@@ -14,13 +14,14 @@ angular.module('ngcrop')
        * @param maxLength
        * @param selectorWidth
        * @param selectorColor
+       * @param outputImageFormat
        * @constructor
        */
-      function CropCanvas(canvasElement, maxLength, selectorWidth, selectorColor){
+      function CropCanvas(canvasElement, maxLength, selectorWidth, selectorColor, outputImageFormat){
 
         this._canvas = canvasElement;
         this._context = this._canvas[0].getContext('2d');
-        this._resultCanvas = undefined;
+        this._resultCanvas = angular.isDefined(outputImageFormat) ? new ResultCanvas(outputImageFormat): new ResultCanvas('image/png');
         this._maxLength = maxLength;
         this._cropSelector = new CropSelection(maxLength);
         this._selectorLineWidth = selectorWidth;
@@ -37,10 +38,6 @@ angular.module('ngcrop')
         this._corner = 0;
         this.addEventHandlers();
 
-      }
-
-      CropCanvas.prototype.setResultCanvasDataFormat = function(format){
-        this._resultCanvas = new ResultCanvas(format);
       }
 
       /**
@@ -147,9 +144,14 @@ angular.module('ngcrop')
 
       }
 
+      /**
+       * Process a new image
+       * @param img
+       * @param onDrawResult
+       */
       CropCanvas.prototype.processNewImage = function(img, onDrawResult){
 
-        this._imgScale = Math.min ((this._maxLength / img.width),(this._maxLength/ img.height));
+        this._imgScale = Math.min ((this._maxLength / img.width),(this._maxLength/ img.height), 1);
         this._canvas[0].width = img.width * this._imgScale;
         this._canvas[0].height = img.width * this._imgScale;
         this._cropSelector.initSelectorDimensions(this._canvas[0].width, this._canvas[0].height);
