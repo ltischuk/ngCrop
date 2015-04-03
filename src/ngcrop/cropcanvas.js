@@ -153,7 +153,7 @@ angular.module('ngcrop')
 
         this._imgScale = Math.min ((this._maxLength / img.width),(this._maxLength/ img.height), 1);
         this._canvas[0].width = img.width * this._imgScale;
-        this._canvas[0].height = img.width * this._imgScale;
+        this._canvas[0].height = img.height * this._imgScale;
         this._cropSelector.initSelectorDimensions(this._canvas[0].width, this._canvas[0].height);
         this.currentImg = img;
         this.onDrawResult = onDrawResult;
