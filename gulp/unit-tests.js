@@ -17,6 +17,11 @@ function runTests (singleRun, done) {
   });
 
   var testFiles = bowerDeps.js.concat([
+    paths.src + '/ngcrop/ngcrop.js',
+    paths.src + '/ngcrop/resultcanvas.js',
+    paths.src + '/ngcrop/cropselection.js',
+    paths.src + '/ngcrop/cropcanvas.js',
+    paths.src + '/ngcrop/cropimage.js',
     paths.src + '/ngcrop/test/**/*.js'
   ]);
 

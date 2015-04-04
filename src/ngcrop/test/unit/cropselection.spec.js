@@ -37,5 +37,15 @@ describe('Factory: CropSelection', function() {
 
   });
 
+  it("should recognize correct corner given a point", function() {
+
+    //Setup initialized data prior to cases
+    cropSelector = new CropSelection();
+    cropSelector.initSelectorDimensions(200,300);
+    expect(cropSelector.nearestCorner(51,52)).toEqual(1);
+
+
+  });
+
 
 });
