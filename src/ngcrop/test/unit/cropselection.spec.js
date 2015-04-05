@@ -42,9 +42,18 @@ describe('Factory: CropSelection', function() {
     //Setup initialized data prior to cases
     cropSelector = new CropSelection();
     cropSelector.initSelectorDimensions(200,300);
+
+    //top left
     expect(cropSelector.nearestCorner(51,52)).toEqual(1);
 
+    //top right
+    expect(cropSelector.nearestCorner(190,52)).toEqual(2);
 
+    //bottom left
+    expect(cropSelector.nearestCorner(10,190)).toEqual(3);
+
+    //bottom right
+    expect(cropSelector.nearestCorner(190,190)).toEqual(4);
   });
 
 
