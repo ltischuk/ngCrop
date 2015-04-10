@@ -27,7 +27,7 @@ angular.module('ngcrop')
        **/
     CropSelection.prototype = {
 
-      //getters for x, y and length for public use
+      //getters/setters
       get x(){
 
         return this._x;
