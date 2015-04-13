@@ -12,22 +12,32 @@ angular.module('ngcrop').directive('cropImage',
             maxImgDisplayLength: '=',
             croppedImgData: '=',
             croppedImgFormat: '@',
-            canvasStyle: '@',
+            addCanvasBorder: '@',
             selectorColor: '@',
             selectorLineWidth: '@'
 
           },
-          template: '<canvas class="{{canvasStyle}}"></canvas>',
+          template: '<canvas></canvas>',
           link: function (scope, element) {
 
             // variables assess and set accordingly
             scope.selectorColor = angular.isDefined(scope.selectorColor) ? scope.selectorColor : '#ff0000';
             scope.selectorLineWidth = angular.isDefined(scope.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
             scope.croppedImgFormat = 'image/' + (angular.isDefined(scope.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
+
             var canvasLength = angular.isDefined(scope.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
 
             //find canvas element on DOM
             var cvs = element.find('canvas');
+
+            // add a border to the canvas if parameter exists
+            if(angular.isDefined(scope.addCanvasBorder) && scope.addCanvasBorder === 'true'){
+
+              cvs.css({
+                border: 'solid 2px #000000'
+              });
+
+            }
 
             //create a new instance of the CropCanvas
             var cropCanvas = new CropCanvas(cvs,canvasLength, scope.selectorLineWidth, scope.selectorColor, scope.croppedImgFormat);
