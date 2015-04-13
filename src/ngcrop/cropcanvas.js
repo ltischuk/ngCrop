@@ -43,7 +43,13 @@ angular.module('ngcrop')
       }
 
 
+      /**
+       * Prototype methods
+       *
+       **/
       CropCanvas.prototype = {
+
+        //accessor methods for variables
 
         get canvas() {
 
@@ -215,6 +221,10 @@ angular.module('ngcrop')
           this._canvasTopPos = top;
 
         },
+        /**
+         * adds event handlers to the canvas for mouse events
+         * @private
+         */
         _addEventHandlers: function(){
 
           var that = this;
@@ -244,6 +254,11 @@ angular.module('ngcrop')
           });
 
       },
+        /**
+         * Method to encapsulate functionality for when mousedown event is fired
+         * @param e
+         * @private
+         */
         _handleMouseDown: function(e){
 
           this.mouseX = e.clientX - this.canvasLeftPos;
@@ -266,6 +281,11 @@ angular.module('ngcrop')
           }
 
         },
+        /**
+         * Method to encapsulate functionality for when mousemove event is fired
+         * @param e
+         * @private
+         */
         _handleMouseMove: function(e){
 
           this.mouseX = e.clientX - this.canvasLeftPos;
@@ -284,7 +304,7 @@ angular.module('ngcrop')
             }
 
           }else{
-            this._drawImageOnCanvas();
+            this._drawCanvas();
 
             var xdiff = this.mouseX - this.lastMouseX;
             var ydiff = this.mouseY - this.lastMouseY;
@@ -292,20 +312,28 @@ angular.module('ngcrop')
             this.cropSelector.move(xdiff, ydiff, this.moveCorner, this.corner);
             this.lastMouseX = this.mouseX;
             this.lastMouseY = this.mouseY;
-            this._drawImageOnCanvas();
+            this._drawCanvas();
           }
 
         },
+        /**
+         * Method to encapsulate functionality for when mouseup event is fired
+         * @private
+         */
         _handleMouseUp: function(){
 
           this.isSelecting = false;
           this.moveCorner = false;
-          this._drawImageOnCanvas();
+          this._drawCanvas();
           this.canvas[0].style.cursor = 'default';
           this.getCroppedImageData();
 
         },
-        _drawImageOnCanvas: function(){
+        /**
+         * Method to redraw the canvas
+         * @private
+         */
+        _drawCanvas: function(){
 
           this.context.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
 
@@ -335,7 +363,7 @@ angular.module('ngcrop')
           this.canvasTopPos = rect.top;
           this.currentImg = img;
           this.onDrawResult = onDrawResult;
-          this._drawImageOnCanvas();
+          this._drawCanvas();
           this.getCroppedImageData();
 
         },
