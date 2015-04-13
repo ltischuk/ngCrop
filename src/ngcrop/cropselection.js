@@ -12,13 +12,13 @@ angular.module('ngcrop')
      */
     function CropSelection(){
 
-      this._x = 0;
-      this._y = 0;
-      this._length = 0;
-      this._outerCushion = 2;
-      this._maxX = 0;
-      this._maxY = 0;
-      this._currentCorner = 0;
+      this.x = 0;
+      this.y = 0;
+      this.length = 0;
+      this.outerCushion = 2;
+      this.maxX = 0;
+      this.maxY = 0;
+      this.currentCorner = 0;
 
     }
 
@@ -27,10 +27,15 @@ angular.module('ngcrop')
        **/
     CropSelection.prototype = {
 
-      //getters/setters
+      //accessor methods
       get x(){
 
         return this._x;
+
+      },
+      set x(x){
+
+        this._x = x;
 
       },
       get y(){
@@ -38,9 +43,59 @@ angular.module('ngcrop')
         return this._y;
 
       },
+      set y(y){
+
+        this._y = y;
+
+      },
       get length(){
 
         return this._length;
+
+      },
+      set length(length){
+
+        this._length = length;
+
+      },
+      get outerCushion(){
+
+        return this._outerCushion;
+
+      },
+      set outerCushion(outerCushion){
+
+        this._outerCushion = outerCushion;
+
+      },
+      get maxX(){
+
+        return this._maxX;
+
+      },
+      set maxX(maxX){
+
+        this._maxX = maxX;
+
+      },
+      get maxY(){
+
+        return this._maxY;
+
+      },
+      set maxY(maxY){
+
+        this._maxY = maxY;
+
+      },
+      get currentCorner(){
+
+        return this._currentCorner;
+
+      },
+      set currentCorner(currentCorner){
+
+        this._currentCorner = currentCorner;
 
       },
       /**
@@ -49,14 +104,14 @@ angular.module('ngcrop')
        */
       initSelectorDimensions : function(parentWidth, parentHeight){
 
-        this._maxX = parentWidth - this._outerCushion;
-        this._maxY = parentHeight - this._outerCushion;
+        this.maxX = parentWidth - this.outerCushion;
+        this.maxY = parentHeight - this.outerCushion;
 
         //position selector in the center of the parent canvas
         var minLenValue = Math.min(parentWidth, parentHeight);
-        this._x = (this._maxX / 2) - (minLenValue/4);
-        this._y = (minLenValue/4);
-        this._length = minLenValue/2;
+        this.x = (this.maxX / 2) - (minLenValue/4);
+        this.y = (minLenValue/4);
+        this.length = minLenValue/2;
 
       },
       /**
@@ -68,10 +123,10 @@ angular.module('ngcrop')
       isInMoveZone : function(pointX, pointY){
 
         //find if point is in moveable territory and not in expandable/collapsable areas near corners
-        var moveZoneMinBound = this._length / 5;
-        var moveZoneMaxBound = this._length - moveZoneMinBound;
-        if(pointX >= (this._x + moveZoneMinBound) && pointX <= (this._x + moveZoneMaxBound) &&
-          pointY >= (this._y + moveZoneMinBound) && pointY <= (this._y + moveZoneMaxBound)){
+        var moveZoneMinBound = this.length / 5;
+        var moveZoneMaxBound = this.length - moveZoneMinBound;
+        if(pointX >= (this.x + moveZoneMinBound) && pointX <= (this.x + moveZoneMaxBound) &&
+          pointY >= (this.y + moveZoneMinBound) && pointY <= (this.y + moveZoneMaxBound)){
 
           return true;
         }
@@ -86,11 +141,11 @@ angular.module('ngcrop')
        */
       _isValidCornerMove : function( increment,lenIncrement){
 
-        var newX = increment + this._x;
-        var newY = increment + this._y;
-        var newLen = this._length + lenIncrement;
-        return (newX >= this._outerCushion && (newX + newLen) < this._maxX &&
-                newY >= this._outerCushion && (newY + newLen) < this._maxY &&
+        var newX = increment + this.x;
+        var newY = increment + this.y;
+        var newLen = this.length + lenIncrement;
+        return (newX >= this.outerCushion && (newX + newLen) < this.maxX &&
+                newY >= this.outerCushion && (newY + newLen) < this.maxY &&
                 newLen > 10);
 
       },
@@ -102,8 +157,8 @@ angular.module('ngcrop')
        */
       _isValidLengthMove: function(acc){
 
-        var tempLength = (this._length + acc);
-        if(this._x + tempLength > this._maxX || this._y + tempLength > this._maxY
+        var tempLength = (this.length + acc);
+        if(this.x + tempLength > this.maxX || this.y + tempLength > this.maxY
             || tempLength < 10){
           return false;
 
@@ -119,8 +174,8 @@ angular.module('ngcrop')
        */
       _isValidXMove : function(acc){
 
-        var tempX = acc + this._x;
-        if(tempX < this._outerCushion || tempX + this._length > this._maxX){
+        var tempX = acc + this.x;
+        if(tempX < this.outerCushion || tempX + this.length > this.maxX){
           return false;
         }
         return true;
@@ -134,8 +189,8 @@ angular.module('ngcrop')
        */
       _isValidYMove : function(acc){
 
-        var tempY = acc + this._y;
-        if(tempY < this._outerCushion || tempY + this._length > this._maxY){
+        var tempY = acc + this.y;
+        if(tempY < this.outerCushion || tempY + this.length > this.maxY){
           return false;
         }
         return true;
@@ -158,7 +213,7 @@ angular.module('ngcrop')
           var moveAdj = Math.max(Math.abs(xMove),Math.abs(yMove));
           var lenAdj = moveAdj * 2;
 
-          if(this._currentCorner == cornerPosition){
+          if(this.currentCorner == cornerPosition){
 
             switch(cornerPosition) {
 
@@ -196,16 +251,16 @@ angular.module('ngcrop')
             }
 
             if(this._isValidCornerMove(moveAdj,lenAdj)){
-              this._x += moveAdj;
-              this._y += moveAdj;
-              this._length += lenAdj;
+              this.x += moveAdj;
+              this.y += moveAdj;
+              this.length += lenAdj;
             }
           }
 
         }else{
           //move entire selector square
-          this._x = this._isValidXMove(xMove) ? this._x + xMove : this._x;
-          this._y = this._isValidYMove(yMove) ? this._y + yMove : this._y;
+          this.x = this._isValidXMove(xMove) ? this.x + xMove : this.x;
+          this.y = this._isValidYMove(yMove) ? this.y + yMove : this.y;
         }
 
       },
@@ -217,10 +272,10 @@ angular.module('ngcrop')
        */
       nearestCorner: function(pointX, pointY){
 
-        var pxFromXLeft = Math.abs(pointX - this._x);
-        var pxFromXRight = Math.abs(pointX - (this._x + this._length));
-        var pxFromYTop = Math.abs(pointY - this._y);
-        var pxFromYBottom = Math.abs(pointY - (this._y + this._length));
+        var pxFromXLeft = Math.abs(pointX - this.x);
+        var pxFromXRight = Math.abs(pointX - (this.x + this.length));
+        var pxFromYTop = Math.abs(pointY - this.y);
+        var pxFromYBottom = Math.abs(pointY - (this.y + this.length));
 
         var topLeft = pxFromXLeft + pxFromYTop;
         var topRight = pxFromXRight + pxFromYTop;
@@ -252,7 +307,7 @@ angular.module('ngcrop')
       },
       setCurrentCorner: function(mouseX, mouseY){
 
-        this._currentCorner = this.nearestCorner(mouseX, mouseY);
+        this.currentCorner = this.nearestCorner(mouseX, mouseY);
 
       }
 

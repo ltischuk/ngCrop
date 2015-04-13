@@ -8,25 +8,35 @@ describe('Directive: CropCanvas', function() {
     var $compile;
     var $rootScope;
     var testImg = new Image();
+    var resultFunction = function(){
+      return true;
+    }
 
   beforeEach(module('ngcrop'));
 
   beforeEach(inject(function ( _CropCanvas_, _$compile_, _$rootScope_) {
 
     CropCanvas = _CropCanvas_;
-      $compile = _$compile_;
-      $rootScope = _$rootScope_;
+    $compile = _$compile_;
+    $rootScope = _$rootScope_;
 
 
   }));
 
-  it('Replaces the element with an HTML5 canvas', function() {
+  it('Should process a new image on a cropcanvas', function() {
     // Compile a piece of HTML containing the directive
     var element = $compile('<crop-image orig-image="testImg"></crop-image>')($rootScope);
     // fire all the watches, so the scope expression {{1 + 1}} will be evaluated
     $rootScope.$digest();
     // Check that the compiled element contains the templated content
-    expect(element.find('canvas').length).toEqual(1);
+    var canvasElem = element.find('canvas');
+    var maxLength = 300;
+    testImg.width = 350;
+    testImg.height = 300;
+    var cropCanvas = new CropCanvas(canvasElem, maxLength,2,"#000000","image/jpeg" );
+    spyOn(cropCanvas, "getCroppedImageData");
+    cropCanvas.processNewImage(testImg,resultFunction);
+    expect(cropCanvas.getCroppedImageData).toHaveBeenCalled();
 
   });
 
