@@ -23,12 +23,12 @@ angular.module('ngcrop')
        */
       ResultCanvas.prototype = {
 
-      getDataUrl: function (img, x, y, sLength,drawWidth, drawHeight) {
+      getDataUrl: function (img, x, y, len) {
 
         //draw the image to the canvas and pull display info
-        this.resultCanvas.height = drawHeight;
-        this.resultCanvas.width = drawWidth;
-        this.context.drawImage(img, x, y, sLength, sLength, 0, 0, drawWidth, drawHeight);
+        this.resultCanvas.height = len;
+        this.resultCanvas.width = len;
+        this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
         return this.resultCanvas.toDataURL(this.outputImageFormat);
       },
       destroy: function(){

@@ -373,7 +373,7 @@ angular.module('ngcrop')
           var y = this.cropSelector.y/this.imgScale;
           var len = this.cropSelector.length/this.imgScale;
 
-          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len, this.canvas[0].width, this.canvas[0].height);
+          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len);
 
           //callback draw data
           this.onDrawResult(data);
