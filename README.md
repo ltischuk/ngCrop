@@ -23,7 +23,7 @@ by running the <code> gulp serve </code> command.
 * maxImgDisplayLength: the maximum length that the image should conform to for display on canvas
 * croppedImgData: the variable which will be bound to the resulting cropped image data URL
 * croppedImgFormat: the text representation of the desired format of cropped image data URL - should be either 'jpeg' or 'png'. Default is png.
-* canvasStyle: a css class to apply to the canvas, i.e. borders.
+* addCanvasBorder: a boolean value of whether or not to turn on a 2px, black border surrounding the canvas
 * selectorColor: crop selector color - default is red (#ff0000)
 * selectorLineWidth: crop selector line width - default is 2px
 
