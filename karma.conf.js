@@ -19,10 +19,6 @@ module.exports = function(config) {
 
     ],
 
-    proxies :  {
-      'sample/': '/base/sample/'
-    },
-
     browsers : ['PhantomJS'],
 
     plugins : [
