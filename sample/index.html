@@ -17,7 +17,7 @@
         var image = new Image();
         image.onload = function(){
 
-          $scope.origImageFile = this;
+            $scope.origImageFile = this;
 
           $scope.$apply(function(){
 
@@ -48,7 +48,7 @@
   <h2 style="text-align: center">Drag corners to expand and/or collapse or click and drag center to move entire square</h2>
   <div>
     <div style="text-align: center">
-      <crop-image data-ng-show="isReadyForCrop" add-canvas-border="true" selector-color="#FF0000" selector-line-width="2" cropped-img-data="croppedImageDataUrl" orig-image="origImageFile"></crop-image>
+      <crop-image data-ng-show="isReadyForCrop" add-canvas-border="true" max-img-display-length="300" selector-color="#FF0000" selector-line-width="2" cropped-img-data="croppedImageDataUrl" orig-image="origImageFile"></crop-image>
       <img data-ng-src="{{croppedImageDataUrl}}" data-ng-show="!isReadyForCrop" height="200px" width="200px">
     </div>
     <div class="row" style="margin-top: 20px"></div>

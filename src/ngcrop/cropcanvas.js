@@ -337,19 +337,23 @@ angular.module('ngcrop')
 
           this.context.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
 
-          var sX =  0;
-          var sY =  0;
-          var sWidth =  this.currentImg.width;
-          var sHeight =  this.currentImg.height;
-          var drawWidth = this.canvas[0].width;
-          var drawHeight = this.canvas[0].height;
-
           //draw the image to the canvas
-          this.context.drawImage(this.currentImg,sX,sY,sWidth,sHeight,0,0,drawWidth,drawHeight);
+          this.context.drawImage(this.currentImg,0,0,this.currentImg.width,this.currentImg.height,0,0,this.canvas[0].width,this.canvas[0].height);
           this.context.lineWidth = this.selectorLineWidth;
           this.context.strokeStyle = this.selectorColor;
           this.context.strokeRect(this.cropSelector.x,this.cropSelector.y,this.cropSelector.length,this.cropSelector.length);
 
+
+        },
+        getCroppedImageData: function(){
+
+          var x = this.cropSelector.x/this.imgScale;
+          var y = this.cropSelector.y/this.imgScale;
+          var len = this.cropSelector.length/this.imgScale;
+          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len);
+
+          //callback draw data
+          this.onDrawResult(data);
 
         },
         processNewImage: function(img, onDrawResult){
@@ -365,18 +369,6 @@ angular.module('ngcrop')
           this.onDrawResult = onDrawResult;
           this._drawCanvas();
           this.getCroppedImageData();
-
-        },
-        getCroppedImageData: function(){
-
-          var x = this.cropSelector.x/this.imgScale;
-          var y = this.cropSelector.y/this.imgScale;
-          var len = this.cropSelector.length/this.imgScale;
-
-          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len);
-
-          //callback draw data
-          this.onDrawResult(data);
 
         },
         destroy: function(){

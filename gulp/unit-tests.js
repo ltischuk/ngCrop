@@ -16,16 +16,7 @@ function runTests (singleRun, done) {
     devDependencies: true
   });
 
-  var testFiles = bowerDeps.js.concat([
-    paths.src + '/ngcrop/ngcrop.js',
-    paths.src + '/ngcrop/resultcanvas.js',
-    paths.src + '/ngcrop/cropselection.js',
-    paths.src + '/ngcrop/cropcanvas.js',
-    paths.src + '/ngcrop/cropimage.js',
-    paths.src + '/ngcrop/test/**/*.js'
-  ]);
-
-  gulp.src(testFiles)
+  gulp.src('/foobar')
     .pipe($.karma({
       configFile: 'karma.conf.js',
       action: (singleRun)? 'run': 'watch'

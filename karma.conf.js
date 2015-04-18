@@ -14,8 +14,14 @@ module.exports = function(config) {
       'bower_components/angular-mocks/angular-mocks.js',
       'src/ngcrop/ngcrop.js',
       'src/ngcrop/*.js',
-      'src/ngcrop/test/**/*.spec.js'
+      'src/ngcrop/test/**/*.spec.js',
+      {pattern: 'sample/*.jpeg', included: false, served: true}
+
     ],
+
+    proxies :  {
+      'sample/': '/base/sample/'
+    },
 
     browsers : ['PhantomJS'],
 

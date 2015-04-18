@@ -23,6 +23,16 @@ describe('Directive: CropCanvas', function() {
 
   }));
 
+  beforeEach(function(done){
+
+    testImg.onload = function(){
+
+      done();
+    }
+    testImg.src = 'base/sample/testimage.jpeg';
+
+  });
+
   it('Should process a new image on a cropcanvas', function() {
     // Compile a piece of HTML containing the directive
     var element = $compile('<crop-image orig-image="testImg"></crop-image>')($rootScope);
@@ -31,12 +41,11 @@ describe('Directive: CropCanvas', function() {
     // Check that the compiled element contains the templated content
     var canvasElem = element.find('canvas');
     var maxLength = 300;
-    testImg.width = 350;
-    testImg.height = 300;
     var cropCanvas = new CropCanvas(canvasElem, maxLength,2,"#000000","image/jpeg" );
     spyOn(cropCanvas, "getCroppedImageData");
     cropCanvas.processNewImage(testImg,resultFunction);
     expect(cropCanvas.getCroppedImageData).toHaveBeenCalled();
+
 
   });
 
