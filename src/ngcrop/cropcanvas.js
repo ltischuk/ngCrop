@@ -17,7 +17,7 @@ angular.module('ngcrop')
        * @param outputImageFormat
        * @constructor
        */
-      function CropCanvas(canvasElement, maxLength, selectorWidth, selectorColor, outputImageFormat){
+      function CropCanvas(canvasElement, maxLength, selectorWidth, selectorColor, outputImageFormat, onCropResult){
 
         this.canvas = canvasElement;
         this.context = canvasElement[0].getContext('2d');
@@ -37,7 +37,7 @@ angular.module('ngcrop')
         this.canvasLeftPos = 0;
         this.canvasTopPos = 0;
         this.currentImg = undefined;
-        this.onDrawResult = undefined;
+        this.onCropResult = onCropResult;
         this._addEventHandlers();
 
       }
@@ -353,10 +353,10 @@ angular.module('ngcrop')
           var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len);
 
           //callback draw data
-          this.onDrawResult(data);
+          this.onCropResult(data);
 
         },
-        processNewImage: function(img, onDrawResult){
+        processNewImage: function(img){
 
           this.imgScale = Math.min ((this.maxLength / img.width),(this.maxLength/ img.height), 1);
           this.canvas[0].width = img.width * this.imgScale;
@@ -366,7 +366,6 @@ angular.module('ngcrop')
           this.canvasLeftPos = rect.left;
           this.canvasTopPos = rect.top;
           this.currentImg = img;
-          this.onDrawResult = onDrawResult;
           this._drawCanvas();
           this.getCroppedImageData();
 

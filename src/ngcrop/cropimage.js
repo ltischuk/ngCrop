@@ -25,7 +25,8 @@ angular.module('ngcrop').directive('cropImage',
             scope.selectorLineWidth = angular.isDefined(scope.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
             scope.croppedImgFormat = 'image/' + (angular.isDefined(scope.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
 
-            var canvasLength = angular.isDefined(scope.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
+            //maximum length of the canvas
+            var maxCanvasLength = angular.isDefined(scope.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
 
             //find canvas element on DOM
             var cvs = element.find('canvas');
@@ -40,7 +41,7 @@ angular.module('ngcrop').directive('cropImage',
             }
 
             //create a new instance of the CropCanvas
-            var cropCanvas = new CropCanvas(cvs,canvasLength, scope.selectorLineWidth, scope.selectorColor, scope.croppedImgFormat);
+            var cropCanvas = new CropCanvas(cvs,maxCanvasLength, scope.selectorLineWidth, scope.selectorColor, scope.croppedImgFormat, onCropResult);
 
             //watch for changes on the main original image in the controller that contains the image (uploads of new images, etc.)
             scope.$watch(function(scope) { return scope.origImage },
@@ -48,7 +49,7 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newImage)){
 
-                  cropCanvas.processNewImage(newImage, onCropResult);
+                  cropCanvas.processNewImage(newImage);
 
                 }
               }
