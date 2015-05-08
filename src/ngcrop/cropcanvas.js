@@ -1,5 +1,9 @@
 /**
  * Created by ltischuk on 2/10/15.
+ * Factory: CropCanvas
+ * Hosts an HTML5 canvas element and controls behavior such as:
+ *  - drawing image and square on top of canvas given input points
+ *  - obtaining data URL from a resultCanvas instance
  */
 angular.module('ngcrop')
     .factory('CropCanvas',
@@ -229,24 +233,28 @@ angular.module('ngcrop')
 
           var that = this;
 
+          //on mousedown event
           this.canvas.on('mousedown', function(e) {
 
             that._handleMouseDown(e);
 
           });
 
+          //on mouseup event
           this.canvas.on('mouseup', function(e) {
 
             that._handleMouseUp(e);
 
           });
 
+          //onmousemove event
           this.canvas.on('mousemove', function(e) {
 
             that._handleMouseMove(e);
 
           });
 
+          //onmouseout event
           this.canvas.on('mouseout', function(e){
 
             that._handleMouseUp(e);
@@ -267,6 +275,9 @@ angular.module('ngcrop')
           this.lastMouseY = this.mouseY;
           this.isSelecting = true;
           this.cropSelector.setCurrentCorner(this.mouseX, this.mouseY);
+
+          //if in move zone which will move selector horizontally or vertically
+          //change cursor and set moveCorner to false
           if(this.cropSelector.isInMoveZone(this.mouseX, this.mouseY)){
 
             this.canvas[0].style.cursor = 'move';
@@ -274,6 +285,8 @@ angular.module('ngcrop')
 
           }
           else{
+
+            // we are in corner zone - find nearest corner and set moveCorner to true
             this.canvas[0].style.cursor = 'crosshair';
             this.corner = this.cropSelector.nearestCorner(this.mouseX, this.mouseY);
             this.moveCorner = true;
@@ -291,6 +304,7 @@ angular.module('ngcrop')
           this.mouseX = e.clientX - this.canvasLeftPos;
           this.mouseY = e.clientY - this.canvasTopPos;
 
+          //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
 
             if(this.cropSelector.isInMoveZone(this.mouseX, this.mouseY)){
@@ -304,6 +318,8 @@ angular.module('ngcrop')
             }
 
           }else{
+
+            //we are in isSelecting state, draw the canvas, assess move, then redraw canvas
             this._drawCanvas();
 
             var xdiff = this.mouseX - this.lastMouseX;
@@ -322,6 +338,7 @@ angular.module('ngcrop')
          */
         _handleMouseUp: function(){
 
+          //turn selector guide variables off and output cropped image data from current selector location
           this.isSelecting = false;
           this.moveCorner = false;
           this._drawCanvas();
@@ -335,16 +352,23 @@ angular.module('ngcrop')
          */
         _drawCanvas: function(){
 
+          //clear the selector rectangle first
           this.context.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
 
           //draw the image to the canvas
           this.context.drawImage(this.currentImg,0,0,this.currentImg.width,this.currentImg.height,0,0,this.canvas[0].width,this.canvas[0].height);
+
+          //then draw the rectangle
           this.context.lineWidth = this.selectorLineWidth;
           this.context.strokeStyle = this.selectorColor;
           this.context.strokeRect(this.cropSelector.x,this.cropSelector.y,this.cropSelector.length,this.cropSelector.length);
 
 
         },
+        /**
+         * Draw the cropped image portion to the result canvas and
+         * get resulting image data URL and call callback function
+         */
         getCroppedImageData: function(){
 
           var x = this.cropSelector.x/this.imgScale;
@@ -356,20 +380,35 @@ angular.module('ngcrop')
           this.onCropResult(data);
 
         },
+        /**
+         * Process a new image on the canvas and init variables for canvas and cropSelector
+         * @param img
+         */
         processNewImage: function(img){
 
+          //obtain image scale and set canvas dimensions
           this.imgScale = Math.min ((this.maxLength / img.width),(this.maxLength/ img.height), 1);
           this.canvas[0].width = img.width * this.imgScale;
           this.canvas[0].height = img.height * this.imgScale;
+
+          //initialize cropSelector dimensions
           this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height);
+
+          //obtain bounds for the rectangle to assess mouse event points
           var rect = this.canvas[0].getBoundingClientRect();
           this.canvasLeftPos = rect.left;
           this.canvasTopPos = rect.top;
+
+          //set currently image variable, draw the canvas
+          // then get the cropped image data from current cropSelector position
           this.currentImg = img;
           this._drawCanvas();
           this.getCroppedImageData();
 
         },
+        /**
+         * When parent scope is destroyed, clean up the DOM and remove elements
+         */
         destroy: function(){
 
           this.canvas.off('mousedown',this._handleMouseDown);

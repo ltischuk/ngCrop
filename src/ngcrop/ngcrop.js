@@ -1,5 +1,5 @@
 /**
- * Created by ltischuk on 10/19/14.
+ * Created by ltischuk on 1/19/15.
  */
 angular
     .module('ngcrop', [])

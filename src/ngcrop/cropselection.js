@@ -206,13 +206,16 @@ angular.module('ngcrop')
 
         if(isCorner){
 
-          //expand or collapse selector square depending on movement and corner
+          // assess the direction of the current move, then normalize the adjustments so we maintain
+          // smoothness in movement
           var movingUp = yMove < 0 ? true: false;
           var movingLeft = xMove < 0 ? true : false;
           var movingDown = yMove > 0 ? true : false;
           var moveAdj = Math.max(Math.abs(xMove),Math.abs(yMove));
           var lenAdj = moveAdj * 2;
 
+          //if the corner passed in is the same as the currentCorner from the mousedown event,
+          // calculate the move and length adjustment to expand and/or collapse square
           if(this.currentCorner == cornerPosition){
 
             switch(cornerPosition) {
@@ -250,6 +253,7 @@ angular.module('ngcrop')
               }
             }
 
+            //if its a valid move, then adjust x,y and length
             if(this._isValidCornerMove(moveAdj,lenAdj)){
               this.x += moveAdj;
               this.y += moveAdj;
@@ -258,7 +262,7 @@ angular.module('ngcrop')
           }
 
         }else{
-          //move entire selector square
+          //otherwise move entire selector square as it is not a corner move
           this.x = this._isValidXMove(xMove) ? this.x + xMove : this.x;
           this.y = this._isValidYMove(yMove) ? this.y + yMove : this.y;
         }
@@ -268,19 +272,24 @@ angular.module('ngcrop')
        * Find nearest corner given a point on the canvas
        * @param pointX
        * @param pointY
+       * @private
        * @returns {number}
        */
-      nearestCorner: function(pointX, pointY){
+      _nearestCorner: function(pointX, pointY){
 
+        //assess the number of pixels from the given points
         var pxFromXLeft = Math.abs(pointX - this.x);
         var pxFromXRight = Math.abs(pointX - (this.x + this.length));
         var pxFromYTop = Math.abs(pointY - this.y);
         var pxFromYBottom = Math.abs(pointY - (this.y + this.length));
 
+        //calibrate the corners given the pixels from the points
         var topLeft = pxFromXLeft + pxFromYTop;
         var topRight = pxFromXRight + pxFromYTop;
         var bottomLeft = pxFromXLeft + pxFromYBottom;
         var bottomRight = pxFromXRight + pxFromYBottom;
+
+        //figure out the nearest corner given the smallest value from the calibrated corners
         var chosen = Math.min(topLeft, topRight, bottomLeft, bottomRight);
 
         var corner = 0;
@@ -305,9 +314,14 @@ angular.module('ngcrop')
         return corner;
 
       },
+      /**
+       * Lock the current corner given an X and Y point
+       * @param mouseX
+       * @param mouseY
+       */
       setCurrentCorner: function(mouseX, mouseY){
 
-        this.currentCorner = this.nearestCorner(mouseX, mouseY);
+        this.currentCorner = this._nearestCorner(mouseX, mouseY);
 
       }
 

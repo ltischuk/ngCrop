@@ -1,6 +1,16 @@
 /**
- * Created by ltischuk on 11/8/14.
+ * Created by ltischuk on 12/29/14.
  * Directive: cropImage
+ * Adds functionality to an HTML5 canvas element
+ * restricted to elements
+ * Receives options:
+ * origImage - required input that is two-way bound to controller variable and is an Image object (the image to crop)
+ * maxImgDisplayLength - max length in pixels to confine the canvas to in the DOM
+ * croppedImgData: required input that is two-way bound to controller variable and is a DataURL of cropped image data
+ * addCanvasBorder: boolean value (true or false) to turn on/off a 2px black border around canvas
+ * selectorColor: string hex value of color for the selector square
+ * selectorLineWidth: number value of border width in pixels
+ *
  */
 angular.module('ngcrop').directive('cropImage',
   function(CropCanvas) {

@@ -23,19 +23,30 @@ angular.module('ngcrop')
        */
       ResultCanvas.prototype = {
 
-      getDataUrl: function (img, x, y, len) {
+        /**
+         * Given an image and clipped points, draw image to private canvas and get data URL
+         * @param img
+         * @param x
+         * @param y
+         * @param len
+         * @returns {*}
+         */
+        getDataUrl: function (img, x, y, len) {
 
-        //draw the image to the canvas and pull display info
-        this.resultCanvas.height = len;
-        this.resultCanvas.width = len;
-        this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
-        return this.resultCanvas.toDataURL(this.outputImageFormat);
-      },
-      destroy: function(){
+          //draw the image to the canvas and pull display info
+          this.resultCanvas.height = len;
+          this.resultCanvas.width = len;
+          this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
+          return this.resultCanvas.toDataURL(this.outputImageFormat);
+        },
+        /**
+         * Remove the canvas from the DOM
+         */
+        destroy: function(){
 
-        this.resultCanvas.remove();
+          this.resultCanvas.remove();
 
-      }
+        }
 
     }
 
