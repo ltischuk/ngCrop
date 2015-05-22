@@ -26,7 +26,3 @@ by running the <code> gulp serve </code> command.
 * addCanvasBorder: a boolean value of whether or not to turn on a 2px, black border surrounding the canvas
 * selectorColor: crop selector color - default is red (#ff0000)
 * selectorLineWidth: crop selector line width - default is 2px
-
-## Demo
-
-* To view a demo, visit this Plunkr : http://plnkr.co/edit/nPHBVzIdgwhZYlFOCFPD?p=preview

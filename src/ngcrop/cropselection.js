@@ -275,7 +275,7 @@ angular.module('ngcrop')
        * @private
        * @returns {number}
        */
-      _nearestCorner: function(pointX, pointY){
+      nearestCorner: function(pointX, pointY){
 
         //assess the number of pixels from the given points
         var pxFromXLeft = Math.abs(pointX - this.x);
@@ -321,7 +321,7 @@ angular.module('ngcrop')
        */
       setCurrentCorner: function(mouseX, mouseY){
 
-        this.currentCorner = this._nearestCorner(mouseX, mouseY);
+        this.currentCorner = this.nearestCorner(mouseX, mouseY);
 
       }
 

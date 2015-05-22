@@ -1,5 +1,5 @@
 /**
- * Created by ltischuk on 10/19/14.
+ * Created by ltischuk on 1/19/15.
  */
 angular
     .module('ngcrop', [])
@@ -14,6 +14,10 @@ angular
 
 /**
  * Created by ltischuk on 2/10/15.
+ * Factory: CropCanvas
+ * Hosts an HTML5 canvas element and controls behavior such as:
+ *  - drawing image and square on top of canvas given input points
+ *  - obtaining data URL from a resultCanvas instance
  */
 angular.module('ngcrop')
     .factory('CropCanvas',
@@ -243,24 +247,28 @@ angular.module('ngcrop')
 
           var that = this;
 
+          //on mousedown event
           this.canvas.on('mousedown', function(e) {
 
             that._handleMouseDown(e);
 
           });
 
+          //on mouseup event
           this.canvas.on('mouseup', function(e) {
 
             that._handleMouseUp(e);
 
           });
 
+          //onmousemove event
           this.canvas.on('mousemove', function(e) {
 
             that._handleMouseMove(e);
 
           });
 
+          //onmouseout event
           this.canvas.on('mouseout', function(e){
 
             that._handleMouseUp(e);
@@ -281,6 +289,9 @@ angular.module('ngcrop')
           this.lastMouseY = this.mouseY;
           this.isSelecting = true;
           this.cropSelector.setCurrentCorner(this.mouseX, this.mouseY);
+
+          //if in move zone which will move selector horizontally or vertically
+          //change cursor and set moveCorner to false
           if(this.cropSelector.isInMoveZone(this.mouseX, this.mouseY)){
 
             this.canvas[0].style.cursor = 'move';
@@ -288,6 +299,8 @@ angular.module('ngcrop')
 
           }
           else{
+
+            // we are in corner zone - find nearest corner and set moveCorner to true
             this.canvas[0].style.cursor = 'crosshair';
             this.corner = this.cropSelector.nearestCorner(this.mouseX, this.mouseY);
             this.moveCorner = true;
@@ -305,6 +318,7 @@ angular.module('ngcrop')
           this.mouseX = e.clientX - this.canvasLeftPos;
           this.mouseY = e.clientY - this.canvasTopPos;
 
+          //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
 
             if(this.cropSelector.isInMoveZone(this.mouseX, this.mouseY)){
@@ -318,6 +332,8 @@ angular.module('ngcrop')
             }
 
           }else{
+
+            //we are in isSelecting state, draw the canvas, assess move, then redraw canvas
             this._drawCanvas();
 
             var xdiff = this.mouseX - this.lastMouseX;
@@ -336,6 +352,7 @@ angular.module('ngcrop')
          */
         _handleMouseUp: function(){
 
+          //turn selector guide variables off and output cropped image data from current selector location
           this.isSelecting = false;
           this.moveCorner = false;
           this._drawCanvas();
@@ -349,16 +366,23 @@ angular.module('ngcrop')
          */
         _drawCanvas: function(){
 
+          //clear the selector rectangle first
           this.context.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
 
           //draw the image to the canvas
           this.context.drawImage(this.currentImg,0,0,this.currentImg.width,this.currentImg.height,0,0,this.canvas[0].width,this.canvas[0].height);
+
+          //then draw the rectangle
           this.context.lineWidth = this.selectorLineWidth;
           this.context.strokeStyle = this.selectorColor;
           this.context.strokeRect(this.cropSelector.x,this.cropSelector.y,this.cropSelector.length,this.cropSelector.length);
 
 
         },
+        /**
+         * Draw the cropped image portion to the result canvas and
+         * get resulting image data URL and call callback function
+         */
         getCroppedImageData: function(){
 
           var x = this.cropSelector.x/this.imgScale;
@@ -370,20 +394,35 @@ angular.module('ngcrop')
           this.onCropResult(data);
 
         },
+        /**
+         * Process a new image on the canvas and init variables for canvas and cropSelector
+         * @param img
+         */
         processNewImage: function(img){
 
+          //obtain image scale and set canvas dimensions
           this.imgScale = Math.min ((this.maxLength / img.width),(this.maxLength/ img.height), 1);
           this.canvas[0].width = img.width * this.imgScale;
           this.canvas[0].height = img.height * this.imgScale;
+
+          //initialize cropSelector dimensions
           this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height);
+
+          //obtain bounds for the rectangle to assess mouse event points
           var rect = this.canvas[0].getBoundingClientRect();
           this.canvasLeftPos = rect.left;
           this.canvasTopPos = rect.top;
+
+          //set currently image variable, draw the canvas
+          // then get the cropped image data from current cropSelector position
           this.currentImg = img;
           this._drawCanvas();
           this.getCroppedImageData();
 
         },
+        /**
+         * When parent scope is destroyed, clean up the DOM and remove elements
+         */
         destroy: function(){
 
           this.canvas.off('mousedown',this._handleMouseDown);
@@ -609,13 +648,16 @@ angular.module('ngcrop')
 
         if(isCorner){
 
-          //expand or collapse selector square depending on movement and corner
+          // assess the direction of the current move, then normalize the adjustments so we maintain
+          // smoothness in movement
           var movingUp = yMove < 0 ? true: false;
           var movingLeft = xMove < 0 ? true : false;
           var movingDown = yMove > 0 ? true : false;
           var moveAdj = Math.max(Math.abs(xMove),Math.abs(yMove));
           var lenAdj = moveAdj * 2;
 
+          //if the corner passed in is the same as the currentCorner from the mousedown event,
+          // calculate the move and length adjustment to expand and/or collapse square
           if(this.currentCorner == cornerPosition){
 
             switch(cornerPosition) {
@@ -653,6 +695,7 @@ angular.module('ngcrop')
               }
             }
 
+            //if its a valid move, then adjust x,y and length
             if(this._isValidCornerMove(moveAdj,lenAdj)){
               this.x += moveAdj;
               this.y += moveAdj;
@@ -661,7 +704,7 @@ angular.module('ngcrop')
           }
 
         }else{
-          //move entire selector square
+          //otherwise move entire selector square as it is not a corner move
           this.x = this._isValidXMove(xMove) ? this.x + xMove : this.x;
           this.y = this._isValidYMove(yMove) ? this.y + yMove : this.y;
         }
@@ -671,19 +714,24 @@ angular.module('ngcrop')
        * Find nearest corner given a point on the canvas
        * @param pointX
        * @param pointY
+       * @private
        * @returns {number}
        */
       nearestCorner: function(pointX, pointY){
 
+        //assess the number of pixels from the given points
         var pxFromXLeft = Math.abs(pointX - this.x);
         var pxFromXRight = Math.abs(pointX - (this.x + this.length));
         var pxFromYTop = Math.abs(pointY - this.y);
         var pxFromYBottom = Math.abs(pointY - (this.y + this.length));
 
+        //calibrate the corners given the pixels from the points
         var topLeft = pxFromXLeft + pxFromYTop;
         var topRight = pxFromXRight + pxFromYTop;
         var bottomLeft = pxFromXLeft + pxFromYBottom;
         var bottomRight = pxFromXRight + pxFromYBottom;
+
+        //figure out the nearest corner given the smallest value from the calibrated corners
         var chosen = Math.min(topLeft, topRight, bottomLeft, bottomRight);
 
         var corner = 0;
@@ -708,6 +756,11 @@ angular.module('ngcrop')
         return corner;
 
       },
+      /**
+       * Lock the current corner given an X and Y point
+       * @param mouseX
+       * @param mouseY
+       */
       setCurrentCorner: function(mouseX, mouseY){
 
         this.currentCorner = this.nearestCorner(mouseX, mouseY);
@@ -723,8 +776,18 @@ angular.module('ngcrop')
 );
 
 /**
- * Created by ltischuk on 11/8/14.
+ * Created by ltischuk on 12/29/14.
  * Directive: cropImage
+ * Adds functionality to an HTML5 canvas element
+ * restricted to elements
+ * Receives options:
+ * origImage - required input that is two-way bound to controller variable and is an Image object (the image to crop)
+ * maxImgDisplayLength - max length in pixels to confine the canvas to in the DOM
+ * croppedImgData: required input that is two-way bound to controller variable and is a DataURL of cropped image data
+ * addCanvasBorder: boolean value (true or false) to turn on/off a 2px black border around canvas
+ * selectorColor: string hex value of color for the selector square
+ * selectorLineWidth: number value of border width in pixels
+ *
  */
 angular.module('ngcrop').directive('cropImage',
   function(CropCanvas) {
@@ -828,19 +891,30 @@ angular.module('ngcrop')
        */
       ResultCanvas.prototype = {
 
-      getDataUrl: function (img, x, y, len) {
+        /**
+         * Given an image and clipped points, draw image to private canvas and get data URL
+         * @param img
+         * @param x
+         * @param y
+         * @param len
+         * @returns {*}
+         */
+        getDataUrl: function (img, x, y, len) {
 
-        //draw the image to the canvas and pull display info
-        this.resultCanvas.height = len;
-        this.resultCanvas.width = len;
-        this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
-        return this.resultCanvas.toDataURL(this.outputImageFormat);
-      },
-      destroy: function(){
+          //draw the image to the canvas and pull display info
+          this.resultCanvas.height = len;
+          this.resultCanvas.width = len;
+          this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
+          return this.resultCanvas.toDataURL(this.outputImageFormat);
+        },
+        /**
+         * Remove the canvas from the DOM
+         */
+        destroy: function(){
 
-        this.resultCanvas.remove();
+          this.resultCanvas.remove();
 
-      }
+        }
 
     }
 
