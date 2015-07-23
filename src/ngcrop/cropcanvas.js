@@ -33,10 +33,10 @@ angular.module('ngcrop')
         this.imgScale = 1;
         this.isSelecting = false;
         this.moveCorner = false;
-        this.lastMouseX = 0;
-        this.lastMouseY = 0;
-        this.mouseX = 0;
-        this.mouseY = 0;
+        this.lastX = 0;
+        this.lastY = 0;
+        this.currentX = 0;
+        this.currentY = 0;
         this.corner = 0;
         this.canvasLeftPos = 0;
         this.canvasTopPos = 0;
@@ -155,42 +155,42 @@ angular.module('ngcrop')
           this._moveCorner = moveCorner;
 
         },
-        get lastMouseX() {
+        get lastX() {
 
           return this._lastMouseX;
 
         },
-        set lastMouseX(lastMouseX){
+        set lastX(lastMouseX){
 
           this._lastMouseX = lastMouseX;
 
         },
-        get lastMouseY() {
+        get lastY() {
 
           return this._lastMouseY;
 
         },
-        set lastMouseY(lastMouseY){
+        set lastY(lastMouseY){
 
           this._lastMouseY = lastMouseY;
 
         },
-        get mouseX() {
+        get currentX() {
 
           return this._mouseX;
 
         },
-        set mouseX(mouseX){
+        set currentX(mouseX){
 
           this._mouseX = mouseX;
 
         },
-        get mouseY() {
+        get currentY() {
 
           return this._mouseY;
 
         },
-        set mouseY(mouseY){
+        set currentY(mouseY){
 
           this._mouseY = mouseY;
 
@@ -236,49 +236,79 @@ angular.module('ngcrop')
           //on mousedown event
           this.canvas.on('mousedown', function(e) {
 
-            that._handleMouseDown(e);
+            that._handleDown(e);
 
           });
 
           //on mouseup event
           this.canvas.on('mouseup', function(e) {
 
-            that._handleMouseUp(e);
+            that._handleUp(e);
 
           });
 
           //onmousemove event
           this.canvas.on('mousemove', function(e) {
 
-            that._handleMouseMove(e);
+            that._handleMove(e);
 
           });
 
           //onmouseout event
           this.canvas.on('mouseout', function(e){
 
-            that._handleMouseUp(e);
+            that._handleUp(e);
+
+          });
+
+          //on mousedown event
+          this.canvas.on('touchstart', function(e) {
+
+            that._handleDown(e);
+
+          });
+
+          //onmousemove event
+          this.canvas.on('touchmove', function(e) {
+
+            that._handleMove(e);
+
+          });
+
+          //on mouseup event
+          this.canvas.on('touchend', function(e) {
+
+            that._handleUp(e);
+
+          });
+
+          //onmouseout event
+          this.canvas.on('touchcancel', function(e){
+
+            that._handleUp(e);
 
           });
 
       },
         /**
-         * Method to encapsulate functionality for when mousedown event is fired
+         * Method to encapsulate functionality for when mousedown or touchstart event is fired
          * @param e
          * @private
          */
-        _handleMouseDown: function(e){
+        _handleDown: function(e){
 
-          this.mouseX = e.clientX - this.canvasLeftPos;
-          this.mouseY = e.clientY - this.canvasTopPos;
-          this.lastMouseX = this.mouseX;
-          this.lastMouseY = this.mouseY;
+          e.preventDefault();
+          var isMobile = angular.isDefined(e.touches);
+          this.currentX = ((isMobile ? e.touches[0].clientX : e.clientX) - this.canvasLeftPos);
+          this.currentY = ((isMobile ? e.touches[0].clientY : e.clientY) - this.canvasTopPos);
+          this.lastX = this.currentX;
+          this.lastY = this.currentY;
           this.isSelecting = true;
-          this.cropSelector.setCurrentCorner(this.mouseX, this.mouseY);
+          this.cropSelector.setCurrentCorner(this.currentX, this.currentY);
 
           //if in move zone which will move selector horizontally or vertically
           //change cursor and set moveCorner to false
-          if(this.cropSelector.isInMoveZone(this.mouseX, this.mouseY)){
+          if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
 
             this.canvas[0].style.cursor = 'move';
             this.moveCorner = false;
@@ -288,26 +318,28 @@ angular.module('ngcrop')
 
             // we are in corner zone - find nearest corner and set moveCorner to true
             this.canvas[0].style.cursor = 'crosshair';
-            this.corner = this.cropSelector.nearestCorner(this.mouseX, this.mouseY);
+            this.corner = this.cropSelector.nearestCorner(this.currentX, this.currentY);
             this.moveCorner = true;
 
           }
 
         },
         /**
-         * Method to encapsulate functionality for when mousemove event is fired
+         * Method to encapsulate functionality for when mousemove or touchmove event is fired
          * @param e
          * @private
          */
-        _handleMouseMove: function(e){
+        _handleMove: function(e){
 
-          this.mouseX = e.clientX - this.canvasLeftPos;
-          this.mouseY = e.clientY - this.canvasTopPos;
+          e.preventDefault();
+          var isMobile = angular.isDefined(e.touches);
+          this.currentX = ((isMobile ? e.touches[0].clientX  : e.clientX) - this.canvasLeftPos);
+          this.currentY = ((isMobile ? e.touches[0].clientY  : e.clientY) - this.canvasTopPos);
 
           //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
 
-            if(this.cropSelector.isInMoveZone(this.mouseX, this.mouseY)){
+            if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
               this.canvas[0].style.cursor = 'move';
             }
             else{
@@ -322,22 +354,23 @@ angular.module('ngcrop')
             //we are in isSelecting state, draw the canvas, assess move, then redraw canvas
             this._drawCanvas();
 
-            var xdiff = this.mouseX - this.lastMouseX;
-            var ydiff = this.mouseY - this.lastMouseY;
+            var xdiff = this.currentX - this.lastX;
+            var ydiff = this.currentY - this.lastY;
 
             this.cropSelector.move(xdiff, ydiff, this.moveCorner, this.corner);
-            this.lastMouseX = this.mouseX;
-            this.lastMouseY = this.mouseY;
+            this.lastX = this.currentX;
+            this.lastY = this.currentY;
             this._drawCanvas();
           }
 
         },
         /**
-         * Method to encapsulate functionality for when mouseup event is fired
+         * Method to encapsulate functionality for when mouseup or touchend/touchcancel event is fired
          * @private
          */
-        _handleMouseUp: function(){
+        _handleUp: function(e){
 
+          e.preventDefault();
           //turn selector guide variables off and output cropped image data from current selector location
           this.isSelecting = false;
           this.moveCorner = false;
@@ -411,10 +444,14 @@ angular.module('ngcrop')
          */
         destroy: function(){
 
-          this.canvas.off('mousedown',this._handleMouseDown);
-          this.canvas.off('mouseup',this._handleMouseUp);
-          this.canvas.off('mouseout',this._handleMouseUp);
-          this.canvas.off('mousemove',this._handleMouseMove);
+          this.canvas.off('mousedown',this._handleDown);
+          this.canvas.off('mouseup',this._handleUp);
+          this.canvas.off('mouseout',this._handleUp);
+          this.canvas.off('mousemove',this._handleMove);
+          this.canvas.off('touchstart',this._handleDown);
+          this.canvas.off('touchmove',this._handleUp);
+          this.canvas.off('touchend',this._handleUp);
+          this.canvas.off('touchcancel',this._handleMove);
           this.canvas.remove();
           this.resultCanvas.destroy();
 
