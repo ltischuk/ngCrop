@@ -13,7 +13,8 @@
  *
  */
 angular.module('ngcrop').directive('cropImage',
-  function(CropCanvas) {
+  function(CropCanvas,
+           $window) {
       return {
           restrict: 'E',
           scope: {
@@ -66,6 +67,19 @@ angular.module('ngcrop').directive('cropImage',
             );
 
             /**
+             * Function to call on orientation change on mobile/tablet devices
+             * Reprocess the image so that the coordinates can be reregistered
+             */
+            var orientationListener = function(){
+
+              cropCanvas.processNewImage(scope.origImage);
+
+            }
+
+            //add the orientationchange event listener
+            $window.addEventListener('orientationchange', orientationListener, false);
+
+            /**
              * Callback to call each time a new cropped image result is obtained
              * @param imageData
              */
@@ -81,6 +95,8 @@ angular.module('ngcrop').directive('cropImage',
              */
             scope.$on('$destroy', function() {
 
+              //remove orientationchange event listener and destroy the cropCanvas
+              $window.removeEventListener('orientationchange',orientationListener, false);
               cropCanvas.destroy();
 
             });
