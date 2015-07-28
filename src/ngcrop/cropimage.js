@@ -29,7 +29,8 @@ angular.module('ngcrop').directive('cropImage',
             selectorStartX: '@?',
             selectorStartY: '@?',
             selectorStartLength: '@?',
-            postCanvasImgProcessCallback: '&?'
+            postCanvasImgProcessCallback: '&?',
+            postSelectorMoveCallback: '&?'
 
           },
           template: '<canvas></canvas>',
@@ -64,7 +65,7 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newImage)){
 
-                  cropCanvas.processNewImage(newImage);
+                  cropCanvas.processNewImage(newImage, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength );
                   if(angular.isFunction(scope.postCanvasImgProcessCallback)){
 
                     scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
@@ -100,6 +101,12 @@ angular.module('ngcrop').directive('cropImage',
             function onCropResult(imageData){
 
               scope.croppedImgData = imageData;
+
+              if(angular.isFunction(scope.postSelectorMoveCallback)) {
+
+                scope.postSelectorMoveCallback({selectorInfo: cropCanvas.getCropCanvasSelectorInfo()});
+
+              }
 
             }
 

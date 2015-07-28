@@ -32,9 +32,13 @@ See the sample test page for an example.  You can view the sample page by runnin
 * selectorStartY: (optional) initial y coordinate on canvas to draw the selector square
 * selectorStartLength: (optional) initial length coordinate on canvas to draw the selector square
 * postCanvasImgProcessCallback: (optional) function to call once the canvas has processed and drawn a new image with the selector square on top of it.<br>
- Additionally, this returns an object containing information about the canvas rendering:<br> 
- 	canvasPositionCoords: an object containing properties: offsetTop and offsetLeft, which are the respective points within the parent container of the canvas<br>
- 	selectorCoords: an object containing properties: x, y and length, which are the points of the selector square on the canvas (as provided to the context strokeRect function of the canvas)
+ Additionally, returns a convenience object containing properties: width and height of the shown canvas
+* postSelectorMoveCallback: (optional) function to call once the selector is drawn and/or changed on the canvas 
+ Additionally, returns a convenience object containing properties:<br>
+ 	* x: the left property of the selector square<br>
+ 	* y: the top property of the selector square<br>
+ 	* length: the length of the square<br>
+ 	* scale: the scale ratio of the original image to the resized image displaying in the canvas
 
 ## Demo
 

@@ -117,7 +117,7 @@ angular.module('ngcrop')
         startLength = Number(startLength);
 
         if(angular.isDefined(startX) && angular.isDefined(startY) && angular.isDefined(startLength) &&
-        isFinite(startX), isFinite(startY), isFinite(startLength)){
+        isFinite(startX), isFinite(startY), isFinite(startLength) && startLength > 0){
 
           this.x = startX;
           this.y = startY;

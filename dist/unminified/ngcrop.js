@@ -428,29 +428,33 @@ angular.module('ngcrop')
 
         },
         /**
-         * Opportunity to provide an object containing information regarding canvas position in the container via top and left coordinates
-         * and the selector coordinates: x, y, and length
-         * @returns {{canvasCoords: {top: *, left: *}, selectorCoords: {x: *, y: *, length: *}}}
+         * Opportunity to provide an object containing information regarding canvas width and height if needed
+         * @returns {width: canvas width, height: canvas height}
          */
         getCropCanvasInfo: function(){
 
           return {
 
-            canvasDimensions:{
-
               width: this.canvas[0].width,
               height : this.canvas[0].height
 
-            },
-            selectorCoords: {
+          }
+
+        },
+        /**
+         * Opportunity to return an object with the coordinates of the selector
+         * @returns {{x: *, y: *, length: *, scale: *}}
+         */
+        getCropCanvasSelectorInfo: function(){
+
+          return {
 
               x: this.cropSelector.x,
               y: this.cropSelector.y,
-              length: this.cropSelector.length
+              length: this.cropSelector.length,
+              scale: this.imgScale
 
             }
-
-          }
 
         },
         /**
@@ -494,7 +498,6 @@ angular.module('ngcrop')
           this.canvas.off('touchend',this._handleUp);
           this.canvas.off('touchcancel',this._handleMove);
           this.canvas.remove();
-          this.resultCanvas.destroy();
 
         }
 
@@ -623,7 +626,7 @@ angular.module('ngcrop')
         startLength = Number(startLength);
 
         if(angular.isDefined(startX) && angular.isDefined(startY) && angular.isDefined(startLength) &&
-        isFinite(startX), isFinite(startY), isFinite(startLength)){
+        isFinite(startX), isFinite(startY), isFinite(startLength) && startLength > 0){
 
           this.x = startX;
           this.y = startY;
@@ -888,7 +891,8 @@ angular.module('ngcrop').directive('cropImage',
             selectorStartX: '@?',
             selectorStartY: '@?',
             selectorStartLength: '@?',
-            postCanvasImgProcessCallback: '&?'
+            postCanvasImgProcessCallback: '&?',
+            postSelectorMoveCallback: '&?'
 
           },
           template: '<canvas></canvas>',
@@ -923,7 +927,7 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newImage)){
 
-                  cropCanvas.processNewImage(newImage);
+                  cropCanvas.processNewImage(newImage, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength );
                   if(angular.isFunction(scope.postCanvasImgProcessCallback)){
 
                     scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
@@ -959,6 +963,12 @@ angular.module('ngcrop').directive('cropImage',
             function onCropResult(imageData){
 
               scope.croppedImgData = imageData;
+
+              if(angular.isFunction(scope.postSelectorMoveCallback)) {
+
+                scope.postSelectorMoveCallback({selectorInfo: cropCanvas.getCropCanvasSelectorInfo()});
+
+              }
 
             }
 
@@ -1018,14 +1028,6 @@ angular.module('ngcrop')
           this.resultCanvas.width = len;
           this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
           return this.resultCanvas.toDataURL(this.outputImageFormat);
-        },
-        /**
-         * Remove the canvas from the DOM
-         */
-        destroy: function(){
-
-          this.resultCanvas.remove();
-
         }
 
     }
