@@ -38,14 +38,6 @@ angular.module('ngcrop')
           this.resultCanvas.width = len;
           this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
           return this.resultCanvas.toDataURL(this.outputImageFormat);
-        },
-        /**
-         * Remove the canvas from the DOM
-         */
-        destroy: function(){
-
-          this.resultCanvas.remove();
-
         }
 
     }

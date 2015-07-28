@@ -480,7 +480,6 @@ angular.module('ngcrop')
           this.canvas.off('touchend',this._handleUp);
           this.canvas.off('touchcancel',this._handleMove);
           this.canvas.remove();
-          this.resultCanvas.destroy();
 
         }
 
