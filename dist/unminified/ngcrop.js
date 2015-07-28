@@ -428,10 +428,36 @@ angular.module('ngcrop')
 
         },
         /**
+         * Opportunity to provide an object containing information regarding canvas position in the container via top and left coordinates
+         * and the selector coordinates: x, y, and length
+         * @returns {{canvasCoords: {top: *, left: *}, selectorCoords: {x: *, y: *, length: *}}}
+         */
+        getCropCanvasInfo: function(){
+
+          return {
+
+            canvasCoords:{
+
+              offsetTop: this.canvas[0].offsetTop,
+              offsetLeft : this.canvas[0].offsetLeft
+
+            },
+            selectorCoords: {
+
+              x: this.cropSelector.x,
+              y: this.cropSelector.y,
+              length: this.cropSelector.length
+
+            }
+
+          }
+
+        },
+        /**
          * Process a new image on the canvas and init variables for canvas and cropSelector
          * @param img
          */
-        processNewImage: function(img){
+        processNewImage: function(img,selectorStartX, selectorStartY, selectorStartLength){
 
           //obtain image scale and set canvas dimensions
           this.imgScale = Math.min ((this.maxLength / img.width),(this.maxLength/ img.height), 1);
@@ -439,7 +465,8 @@ angular.module('ngcrop')
           this.canvas[0].height = img.height * this.imgScale;
 
           //initialize cropSelector dimensions
-          this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height);
+          this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
+              selectorStartX, selectorStartY, selectorStartLength);
 
           //obtain bounds for the rectangle to assess mouse event points
           var rect = this.canvas[0].getBoundingClientRect();
@@ -579,18 +606,38 @@ angular.module('ngcrop')
       },
       /**
        * Set the selector dimensions given a new canvas (parent) width and height
-       * @param img
+       * @param parentWidth
+       * @param parentHeight
+       * @param (optional) startX - starting value of X within the canvas dimensions
+       * @param (optional) startY - starting value of Y within the canvas dimensions
+       * @param (optional) startLength - starting value of length within the canvas dimensions
+       *
        */
-      initSelectorDimensions : function(parentWidth, parentHeight){
+      initSelectorDimensions : function(parentWidth, parentHeight, startX, startY, startLength){
 
         this.maxX = parentWidth - this.outerCushion;
         this.maxY = parentHeight - this.outerCushion;
 
-        //position selector in the center of the parent canvas
-        var minLenValue = Math.min(parentWidth, parentHeight);
-        this.x = (this.maxX / 2) - (minLenValue/4);
-        this.y = (minLenValue/4);
-        this.length = minLenValue/2;
+        startX = Number(startX);
+        startY = Number(startY);
+        startLength = Number(startLength);
+
+        if(angular.isDefined(startX) && angular.isDefined(startY) && angular.isDefined(startLength) &&
+        isFinite(startX), isFinite(startY), isFinite(startLength)){
+
+          this.x = startX;
+          this.y = startY;
+          this.length = startLength;
+
+        }else{
+
+          //position selector in the center of the parent canvas
+          var minLenValue = Math.min(parentWidth, parentHeight);
+          this.x = (this.maxX / 2) - (minLenValue/4);
+          this.y = (minLenValue/4);
+          this.length = minLenValue/2;
+
+        }
 
       },
       /**
@@ -804,8 +851,6 @@ angular.module('ngcrop')
 
       }
 
-
-
     }
 
     return CropSelection;
@@ -834,12 +879,16 @@ angular.module('ngcrop').directive('cropImage',
           scope: {
 
             origImage: '=',
-            maxImgDisplayLength: '=',
             croppedImgData: '=',
-            croppedImgFormat: '@',
-            addCanvasBorder: '@',
-            selectorColor: '@',
-            selectorLineWidth: '@'
+            maxImgDisplayLength: '=?',
+            croppedImgFormat: '@?',
+            addCanvasBorder: '@?',
+            selectorColor: '@?',
+            selectorLineWidth: '@?',
+            selectorStartX: '@?',
+            selectorStartY: '@?',
+            selectorStartLength: '@?',
+            postCanvasImgProcessCallback: '&?'
 
           },
           template: '<canvas></canvas>',
@@ -875,15 +924,33 @@ angular.module('ngcrop').directive('cropImage',
                 if(angular.isDefined(newImage)){
 
                   cropCanvas.processNewImage(newImage);
+                  if(angular.isFunction(scope.postCanvasImgProcessCallback)){
+
+                    scope.postCanvasImgProcessCallback(cropCanvas.getCropCanvasInfo());
+
+                  }
 
                 }
               }
             );
 
-            $window.addEventListener('orientationchange', function() {
-              console.log('orientation changed');
+            /**
+             * Function to call on orientation change on mobile/tablet devices
+             * Reprocess the image so that the coordinates can be reregistered
+             */
+            var orientationListener = function(){
+
               cropCanvas.processNewImage(scope.origImage);
-            }, false);
+              if(angular.isFunction(scope.postCanvasImgProcessCallback)) {
+
+                scope.postCanvasImgProcessCallback(cropCanvas.getCropCanvasInfo());
+
+              }
+
+            }
+
+            //add the orientationchange event listener
+            $window.addEventListener('orientationchange', orientationListener, false);
 
             /**
              * Callback to call each time a new cropped image result is obtained
@@ -901,6 +968,8 @@ angular.module('ngcrop').directive('cropImage',
              */
             scope.$on('$destroy', function() {
 
+              //remove orientationchange event listener and destroy the cropCanvas
+              $window.removeEventListener('orientationchange',orientationListener, false);
               cropCanvas.destroy();
 
             });

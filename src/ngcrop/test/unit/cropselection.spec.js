@@ -56,5 +56,39 @@ describe('Factory: CropSelection', function() {
     expect(cropSelector.nearestCorner(190,190)).toEqual(4);
   });
 
+  it("should initialize the starting selector x, y and length", function() {
+
+    //Setup initialized data prior to cases
+    cropSelector = new CropSelection();
+    cropSelector.initSelectorDimensions(200,300,10,10,100);
+
+    //top left
+    expect(cropSelector.x).toEqual(10);
+
+    //top right
+    expect(cropSelector.y).toEqual(10);
+
+    //bottom left
+    expect(cropSelector.length).toEqual(100);
+
+  });
+
+  it("should initialize the x, y and length to the middle of the canvas", function() {
+
+    //Setup initialized data prior to cases
+    cropSelector = new CropSelection();
+    cropSelector.initSelectorDimensions(200,300);
+
+    //top left
+    expect(cropSelector.x).toEqual(49);
+
+    //top right
+    expect(cropSelector.y).toEqual(50);
+
+    //bottom left
+    expect(cropSelector.length).toEqual(100);
+
+  });
+
 
 });

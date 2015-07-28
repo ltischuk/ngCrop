@@ -100,18 +100,38 @@ angular.module('ngcrop')
       },
       /**
        * Set the selector dimensions given a new canvas (parent) width and height
-       * @param img
+       * @param parentWidth
+       * @param parentHeight
+       * @param (optional) startX - starting value of X within the canvas dimensions
+       * @param (optional) startY - starting value of Y within the canvas dimensions
+       * @param (optional) startLength - starting value of length within the canvas dimensions
+       *
        */
-      initSelectorDimensions : function(parentWidth, parentHeight){
+      initSelectorDimensions : function(parentWidth, parentHeight, startX, startY, startLength){
 
         this.maxX = parentWidth - this.outerCushion;
         this.maxY = parentHeight - this.outerCushion;
 
-        //position selector in the center of the parent canvas
-        var minLenValue = Math.min(parentWidth, parentHeight);
-        this.x = (this.maxX / 2) - (minLenValue/4);
-        this.y = (minLenValue/4);
-        this.length = minLenValue/2;
+        startX = Number(startX);
+        startY = Number(startY);
+        startLength = Number(startLength);
+
+        if(angular.isDefined(startX) && angular.isDefined(startY) && angular.isDefined(startLength) &&
+        isFinite(startX), isFinite(startY), isFinite(startLength)){
+
+          this.x = startX;
+          this.y = startY;
+          this.length = startLength;
+
+        }else{
+
+          //position selector in the center of the parent canvas
+          var minLenValue = Math.min(parentWidth, parentHeight);
+          this.x = (this.maxX / 2) - (minLenValue/4);
+          this.y = (minLenValue/4);
+          this.length = minLenValue/2;
+
+        }
 
       },
       /**
@@ -324,8 +344,6 @@ angular.module('ngcrop')
         this.currentCorner = this.nearestCorner(mouseX, mouseY);
 
       }
-
-
 
     }
 

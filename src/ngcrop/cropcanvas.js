@@ -414,10 +414,36 @@ angular.module('ngcrop')
 
         },
         /**
+         * Opportunity to provide an object containing information regarding canvas position in the container via top and left coordinates
+         * and the selector coordinates: x, y, and length
+         * @returns {{canvasCoords: {top: *, left: *}, selectorCoords: {x: *, y: *, length: *}}}
+         */
+        getCropCanvasInfo: function(){
+
+          return {
+
+            canvasCoords:{
+
+              offsetTop: this.canvas[0].offsetTop,
+              offsetLeft : this.canvas[0].offsetLeft
+
+            },
+            selectorCoords: {
+
+              x: this.cropSelector.x,
+              y: this.cropSelector.y,
+              length: this.cropSelector.length
+
+            }
+
+          }
+
+        },
+        /**
          * Process a new image on the canvas and init variables for canvas and cropSelector
          * @param img
          */
-        processNewImage: function(img){
+        processNewImage: function(img,selectorStartX, selectorStartY, selectorStartLength){
 
           //obtain image scale and set canvas dimensions
           this.imgScale = Math.min ((this.maxLength / img.width),(this.maxLength/ img.height), 1);
@@ -425,7 +451,8 @@ angular.module('ngcrop')
           this.canvas[0].height = img.height * this.imgScale;
 
           //initialize cropSelector dimensions
-          this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height);
+          this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
+              selectorStartX, selectorStartY, selectorStartLength);
 
           //obtain bounds for the rectangle to assess mouse event points
           var rect = this.canvas[0].getBoundingClientRect();
