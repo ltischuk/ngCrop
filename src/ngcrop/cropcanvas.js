@@ -422,10 +422,10 @@ angular.module('ngcrop')
 
           return {
 
-            canvasCoords:{
+            canvasDimensions:{
 
-              offsetTop: this.canvas[0].offsetTop,
-              offsetLeft : this.canvas[0].offsetLeft
+              width: this.canvas[0].width,
+              height : this.canvas[0].height
 
             },
             selectorCoords: {

@@ -67,7 +67,7 @@ angular.module('ngcrop').directive('cropImage',
                   cropCanvas.processNewImage(newImage);
                   if(angular.isFunction(scope.postCanvasImgProcessCallback)){
 
-                    scope.postCanvasImgProcessCallback(cropCanvas.getCropCanvasInfo());
+                    scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
 
                   }
 
@@ -84,7 +84,7 @@ angular.module('ngcrop').directive('cropImage',
               cropCanvas.processNewImage(scope.origImage);
               if(angular.isFunction(scope.postCanvasImgProcessCallback)) {
 
-                scope.postCanvasImgProcessCallback(cropCanvas.getCropCanvasInfo());
+                scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
 
               }
 

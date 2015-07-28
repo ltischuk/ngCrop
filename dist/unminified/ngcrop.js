@@ -436,10 +436,10 @@ angular.module('ngcrop')
 
           return {
 
-            canvasCoords:{
+            canvasDimensions:{
 
-              offsetTop: this.canvas[0].offsetTop,
-              offsetLeft : this.canvas[0].offsetLeft
+              width: this.canvas[0].width,
+              height : this.canvas[0].height
 
             },
             selectorCoords: {
@@ -926,7 +926,7 @@ angular.module('ngcrop').directive('cropImage',
                   cropCanvas.processNewImage(newImage);
                   if(angular.isFunction(scope.postCanvasImgProcessCallback)){
 
-                    scope.postCanvasImgProcessCallback(cropCanvas.getCropCanvasInfo());
+                    scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
 
                   }
 
@@ -943,7 +943,7 @@ angular.module('ngcrop').directive('cropImage',
               cropCanvas.processNewImage(scope.origImage);
               if(angular.isFunction(scope.postCanvasImgProcessCallback)) {
 
-                scope.postCanvasImgProcessCallback(cropCanvas.getCropCanvasInfo());
+                scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
 
               }
 
