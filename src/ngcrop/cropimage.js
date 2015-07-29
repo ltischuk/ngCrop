@@ -65,12 +65,12 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newImage)){
 
-                  cropCanvas.processNewImage(newImage, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength );
-                  if(angular.isFunction(scope.postCanvasImgProcessCallback)){
-
-                    scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
-
-                  }
+                  cropCanvas.processNewImage(newImage, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
+                  //if(angular.isFunction(scope.postCanvasImgProcessCallback)){
+                  //
+                  //  scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
+                  //
+                  //}
 
                 }
               }
