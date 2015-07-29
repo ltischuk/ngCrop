@@ -472,16 +472,22 @@ angular.module('ngcrop')
           this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
               selectorStartX, selectorStartY, selectorStartLength);
 
-          //obtain bounds for the rectangle to assess mouse event points
-          var rect = this.canvas[0].getBoundingClientRect();
-          this.canvasLeftPos = rect.left;
-          this.canvasTopPos = rect.top;
+          //obtain bounds for the rectangle to assess mouse/touch event points
+          this.resetTrackedPointsToBoundingRect();
 
           //set currently image variable, draw the canvas
           // then get the cropped image data from current cropSelector position
           this.currentImg = img;
           this._drawCanvas();
           this.getCroppedImageData();
+
+        },
+        resetTrackedPointsToBoundingRect : function(){
+
+          //obtain bounds for the rectangle to assess mouse/touch event points
+          var rect = this.canvas[0].getBoundingClientRect();
+          this.canvasLeftPos = rect.left;
+          this.canvasTopPos = rect.top;
 
         },
         /**
@@ -908,6 +914,14 @@ angular.module('ngcrop').directive('cropImage',
 
             //find canvas element on DOM
             var cvs = element.find('canvas');
+
+
+            //ensure that cropCanvas tracking points are reset
+            cvs.on('change', function () {
+
+              cropCanvas.resetTrackedPointsToBoundingRect();
+
+            });
 
             // add a border to the canvas if parameter exists
             if(angular.isDefined(scope.addCanvasBorder) && scope.addCanvasBorder === 'true'){

@@ -458,7 +458,7 @@ angular.module('ngcrop')
           this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
               selectorStartX, selectorStartY, selectorStartLength);
 
-          //obtain bounds for the rectangle to assess mouse event points
+          //obtain bounds for the rectangle to assess mouse/touch event points
           var rect = this.canvas[0].getBoundingClientRect();
           this.canvasLeftPos = rect.left;
           this.canvasTopPos = rect.top;
