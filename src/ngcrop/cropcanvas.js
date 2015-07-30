@@ -396,8 +396,12 @@ angular.module('ngcrop')
 
               this.context.save();
               // 90° rotate right
+
+              this.context.translate(this.canvas[0].width/2,this.canvas[0].height/2);
               this.context.rotate(0.5 * Math.PI);
-              this.context.translate(0, -(this.canvas[0].height));
+              //draw the image to the canvas
+              this.context.drawImage(this.currentImg,-(this.currentImg.width/4),-(this.currentImg.height/4),this.canvas[0].width,this.canvas[0].height);
+              this.context.restore();
               break;
 
             }
@@ -405,13 +409,7 @@ angular.module('ngcrop')
           }
 
           //draw the image to the canvas
-          this.context.drawImage(this.currentImg,0,0,this.currentImg.width,this.currentImg.height,0,0,this.canvas[0].width,this.canvas[0].height);
-
-          if(this._orientation == 6){
-
-            this.context.restore();
-
-          }
+        //  this.context.drawImage(this.currentImg,0,0,this.currentImg.width,this.currentImg.height,0,0,this.canvas[0].width,this.canvas[0].height);
 
           //then draw the rectangle
           this.context.lineWidth = this.selectorLineWidth;
