@@ -399,13 +399,13 @@ angular.module('ngcrop')
             case 6: {
 
               this.context.save();
-              // 90° rotate right
 
+              // 90° rotate right
               this.context.translate(this.canvas[0].width/2,this.canvas[0].height/2);
               this.context.rotate(0.5 * Math.PI);
               //draw the image to the canvas
-              x = -(this.currentImg.width/4);
-              y = -(this.currentImg.height/4);
+              x = -(this.canvas[0].height/2);
+              y = -(this.canvas[0].width/2);
               drawWidth = this.canvas[0].height;
               drawHeight = this.canvas[0].width;
               break;
@@ -486,7 +486,7 @@ angular.module('ngcrop')
 
             this.canvas[0].height = this._orientation == 6 ? (img.width * this.imgScale) : (img.height * this.imgScale);
             this.canvas[0].width = this._orientation == 6 ? (img.height * this.imgScale) : (img.width * this.imgScale);
-            alert('orientation: ' + orientation + 'height: ' + this.canvas[0].height + 'width: ' + this.canvas[0].width);
+           // alert('orientation: ' + orientation + 'height: ' + this.canvas[0].height + 'width: ' + this.canvas[0].width);
 
             //initialize cropSelector dimensions
             this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
