@@ -450,7 +450,7 @@ angular.module('ngcrop')
           var x = this.cropSelector.x/this.imgScale;
           var y = this.cropSelector.y/this.imgScale;
           var len = this.cropSelector.length/this.imgScale;
-          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len);
+          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len, this._orientation);
 
           //callback draw data
           this.onCropResult(data);
@@ -1058,12 +1058,34 @@ angular.module('ngcrop')
          * @param len
          * @returns {*}
          */
-        getDataUrl: function (img, x, y, len) {
+        getDataUrl: function (img, x, y, len, orientation) {
 
           //draw the image to the canvas and pull display info
           this.resultCanvas.height = len;
           this.resultCanvas.width = len;
+
+          switch(orientation){
+
+            //for iphones
+            case 6: {
+
+              this.context.save();
+
+              // 90° rotate right
+              this.context.translate(len/2,len/2);
+              this.context.rotate(0.5 * Math.PI);
+              //draw the image to the canvas
+              x = -(len/2);
+              y = -(len/2);
+
+              break;
+
+            }
+
+          }
+
           this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
+          this.context.restore();
           return this.resultCanvas.toDataURL(this.outputImageFormat);
         }
 
