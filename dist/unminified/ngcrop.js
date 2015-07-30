@@ -402,6 +402,10 @@ angular.module('ngcrop')
 
           //clear the selector rectangle first
           this.context.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
+          var x = 0;
+          var y = 0;
+          var drawWidth = this.canvas[0].width;
+          var drawHeight = this.canvas[0].height;
 
           switch(this._orientation){
 
@@ -414,13 +418,18 @@ angular.module('ngcrop')
               this.context.translate(this.canvas[0].width/2,this.canvas[0].height/2);
               this.context.rotate(0.5 * Math.PI);
               //draw the image to the canvas
-              this.context.drawImage(this.currentImg,-(this.currentImg.width/4),-(this.currentImg.height/4),this.canvas[0].width,this.canvas[0].height);
-              this.context.restore();
+              x = -(this.currentImg.width/4);
+              y = -(this.currentImg.height/4);
+              drawWidth = this.canvas[0].height;
+              drawHeight = this.canvas[0].width;
               break;
 
             }
 
           }
+
+          this.context.drawImage(this.currentImg,x,y,drawWidth,drawHeight);
+          this.context.restore();
 
           //draw the image to the canvas
         //  this.context.drawImage(this.currentImg,0,0,this.currentImg.width,this.currentImg.height,0,0,this.canvas[0].width,this.canvas[0].height);
@@ -488,10 +497,10 @@ angular.module('ngcrop')
 
             var orientation = EXIF.getTag(img, 'Orientation');
             this._orientation = (angular.isDefined(orientation) && orientation > 1) ? orientation : this._orientation;
-            this._orientation = 6;
 
             this.canvas[0].height = this._orientation == 6 ? (img.width * this.imgScale) : (img.height * this.imgScale);
             this.canvas[0].width = this._orientation == 6 ? (img.height * this.imgScale) : (img.width * this.imgScale);
+            alert('orientation: ' + orientation + 'height: ' + this.canvas[0].height + 'width: ' + this.canvas[0].width);
 
             //initialize cropSelector dimensions
             this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
