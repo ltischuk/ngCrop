@@ -283,6 +283,13 @@ angular.module('ngcrop')
 
           });
 
+          //on touchleave event
+          this.canvas.on('touchleave', function(e) {
+
+            that._handleUp(e);
+
+          });
+
           //touchcancel event
           this.canvas.on('touchcancel', function(e){
 
@@ -483,6 +490,7 @@ angular.module('ngcrop')
 
             var orientation = EXIF.getTag(img, 'Orientation');
             this._orientation = (angular.isDefined(orientation) && orientation > 1) ? orientation : this._orientation;
+            this._orientation = 6;
 
             this.canvas[0].height = this._orientation == 6 ? (img.width * this.imgScale) : (img.height * this.imgScale);
             this.canvas[0].width = this._orientation == 6 ? (img.height * this.imgScale) : (img.width * this.imgScale);
@@ -517,9 +525,10 @@ angular.module('ngcrop')
           this.canvas.off('mouseout',this._handleUp);
           this.canvas.off('mousemove',this._handleMove);
           this.canvas.off('touchstart',this._handleDown);
-          this.canvas.off('touchmove',this._handleUp);
+          this.canvas.off('touchmove',this._handleMove);
+          this.canvas.off('touchleave',this._handleUp);
           this.canvas.off('touchend',this._handleUp);
-          this.canvas.off('touchcancel',this._handleMove);
+          this.canvas.off('touchcancel',this._handleUp);
           this.canvas.remove();
 
         }

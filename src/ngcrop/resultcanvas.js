@@ -48,8 +48,8 @@ angular.module('ngcrop')
               this.context.translate(len/2,len/2);
               this.context.rotate(0.5 * Math.PI);
               //draw the image to the canvas
-              x = -(len/2);
-              y = -(len/2);
+              //x = -(x/2);
+              //y = -(y/2);
 
               break;
 
