@@ -55,8 +55,8 @@ angular.module('ngcrop')
         this.canvasLeftPos = 0;
         this.canvasTopPos = 0;
         this.currentImg = undefined;
+        this.currentImgOrientation = 1;
         this.onCropResult = onCropResult;
-        this._orientation = 1;
         this._addEventHandlers();
 
       }
@@ -240,6 +240,26 @@ angular.module('ngcrop')
           this._canvasTopPos = top;
 
         },
+        get currentImg(){
+
+          return this._currentImg;
+
+        },
+        set currentImg(img){
+
+          this._currentImg = img;
+
+        },
+        get currentImgOrientation(){
+
+          return this._currentImgOrientation;
+
+        },
+        set currentImgOrientation(value){
+
+          this._currentImgOrientation = value;
+
+        },
         /**
          * adds event handlers to the canvas for mouse events
          * @private
@@ -414,7 +434,7 @@ angular.module('ngcrop')
           var drawWidth = this.canvas[0].width;
           var drawHeight = this.canvas[0].height;
 
-          switch(this._orientation){
+          switch(this.currentImgOrientation){
 
             //for iphones
             case 6: {
@@ -457,7 +477,7 @@ angular.module('ngcrop')
           var x = this.cropSelector.x/this.imgScale;
           var y = this.cropSelector.y/this.imgScale;
           var len = this.cropSelector.length/this.imgScale;
-          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len, this._orientation);
+          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len, this.currentImgOrientation);
 
           //callback draw data
           this.onCropResult(data);
@@ -503,11 +523,11 @@ angular.module('ngcrop')
           EXIF.getData(img, function(){
 
             var orientation = EXIF.getTag(img, 'Orientation');
-            this._orientation = (angular.isDefined(orientation) && orientation > 1) ? orientation : this._orientation;
-            this._orientation = 6;
+            this.currentImgOrientation = (angular.isDefined(orientation) && orientation > 1) ? orientation : this.currentImgOrientation;
+            this.currentImgOrientation = 6;
 
-            this.canvas[0].height = this._orientation == 6 ? (img.width * this.imgScale) : (img.height * this.imgScale);
-            this.canvas[0].width = this._orientation == 6 ? (img.height * this.imgScale) : (img.width * this.imgScale);
+            this.canvas[0].height = this.currentImgOrientation == 6 ? (img.width * this.imgScale) : (img.height * this.imgScale);
+            this.canvas[0].width = this.currentImgOrientation == 6 ? (img.height * this.imgScale) : (img.width * this.imgScale);
            // alert('orientation: ' + orientation + 'height: ' + this.canvas[0].height + 'width: ' + this.canvas[0].width);
 
             //initialize cropSelector dimensions
@@ -1093,7 +1113,7 @@ angular.module('ngcrop')
 
           }
 
-          this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
+          this.context.drawImage(img, y, x, len, len, -len/2, -len/2,len,len);
           this.context.restore();
           return this.resultCanvas.toDataURL(this.outputImageFormat);
         }

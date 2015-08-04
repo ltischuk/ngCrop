@@ -57,7 +57,7 @@ angular.module('ngcrop')
 
           }
 
-          this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
+          this.context.drawImage(img, y, x, len, len, -len/2, -len/2,len,len);
           this.context.restore();
           return this.resultCanvas.toDataURL(this.outputImageFormat);
         }
