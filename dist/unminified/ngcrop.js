@@ -1092,6 +1092,9 @@ angular.module('ngcrop')
           //draw the image to the canvas and pull display info
           this.resultCanvas.height = len;
           this.resultCanvas.width = len;
+          var sX = x;
+          var sY = y;
+          var drawStartingPoint = 0;
 
           switch(orientation){
 
@@ -1103,17 +1106,16 @@ angular.module('ngcrop')
               // 90° rotate right
               this.context.translate(len/2,len/2);
               this.context.rotate(0.5 * Math.PI);
-              //draw the image to the canvas
-              //x = -(x/2);
-              //y = -(y/2);
-
+              sX = y;
+              sY = (img.height - x- len);
+              drawStartingPoint = -len/2;
               break;
 
             }
 
           }
 
-          this.context.drawImage(img, y, x, len, len, -len/2, -len/2,len,len);
+          this.context.drawImage(img, sX, sY, len, len, drawStartingPoint, drawStartingPoint,len,len);
           this.context.restore();
           return this.resultCanvas.toDataURL(this.outputImageFormat);
         }
