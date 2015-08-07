@@ -403,11 +403,16 @@ angular.module('ngcrop')
         _drawCanvas: function(){
 
           //clear the selector rectangle first
-          this.context.clearRect(0, 0, this.canvas[0].width, this.canvas[0].height);
+          var canvasWidth = this.canvas[0].width;
+          var canvasHeight = this.canvas[0].height;
+          this.context.clearRect(0, 0, canvasWidth, canvasHeight);
+
           var x = 0;
           var y = 0;
-          var drawWidth = this.canvas[0].width;
-          var drawHeight = this.canvas[0].height;
+          var drawWidth = canvasWidth;
+          var drawHeight = canvasHeight;
+          var selectorMiddleX = this.cropSelector.x + (this.cropSelector.length/2);
+          var selectorMiddleY = this.cropSelector.y + (this.cropSelector.length/2);
 
           this.context.drawImage(this.currentImg,x,y,drawWidth,drawHeight);
 
@@ -415,6 +420,17 @@ angular.module('ngcrop')
           this.context.lineWidth = this.selectorLineWidth;
           this.context.strokeStyle = this.selectorColor;
           this.context.strokeRect(this.cropSelector.x,this.cropSelector.y,this.cropSelector.length,this.cropSelector.length);
+
+          this.context.beginPath();
+          this.context.lineWidth = 1;
+          this.context.moveTo(selectorMiddleX -4, selectorMiddleY);
+          this.context.lineTo(selectorMiddleX + 4, selectorMiddleY);
+          this.context.stroke();
+
+          this.context.beginPath();
+          this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
+          this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
+          this.context.stroke();
 
 
         },

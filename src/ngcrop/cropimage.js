@@ -77,12 +77,7 @@ angular.module('ngcrop').directive('cropImage',
              */
             var orientationListener = function(){
 
-              cropCanvas.processNewImage(scope.origImage);
-              if(angular.isFunction(scope.postCanvasImgProcessCallback)) {
-
-                scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
-
-              }
+              properlyOrientImage(scope.origImage);
 
             }
 
