@@ -33,21 +33,20 @@ describe('Directive: CropCanvas', function() {
 
   });
 
-  //commented out this test for now due to EXIF requirements
-  //it('Should process a new image on a cropcanvas', function() {
-  //  // Compile a piece of HTML containing the directive
-  //  var element = $compile('<crop-image orig-image="testImg"></crop-image>')($rootScope);
-  //  // fire all the watches, so the scope expression {{1 + 1}} will be evaluated
-  //  $rootScope.$digest();
-  //  // Check that the compiled element contains the templated content
-  //  var canvasElem = element.find('canvas');
-  //  var maxLength = 300;
-  //  var cropCanvas = new CropCanvas(canvasElem, maxLength,2,"#000000","image/jpeg",resultFunction );
-  //  spyOn(cropCanvas, "getCroppedImageData");
-  //  cropCanvas.processNewImage(testImg,undefined,undefined,undefined,resultFunction);
-  //  expect(cropCanvas.getCroppedImageData).toHaveBeenCalled();
-  //
-  //});
+  it('Should process a new image on a cropcanvas', function() {
+    // Compile a piece of HTML containing the directive
+    var element = $compile('<crop-image orig-image="testImg"></crop-image>')($rootScope);
+    // fire all the watches, so the scope expression {{1 + 1}} will be evaluated
+    $rootScope.$digest();
+    // Check that the compiled element contains the templated content
+    var canvasElem = element.find('canvas');
+    var maxLength = 300;
+    var cropCanvas = new CropCanvas(canvasElem, maxLength,2,"#000000","image/jpeg",resultFunction );
+    spyOn(cropCanvas, "getCroppedImageData");
+    cropCanvas.processNewImage(testImg,undefined,undefined,undefined,resultFunction);
+    expect(cropCanvas.getCroppedImageData).toHaveBeenCalled();
+
+  });
 
 
 });

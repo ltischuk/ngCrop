@@ -39,28 +39,7 @@ angular.module('ngcrop')
           var sX = x;
           var sY = y;
           var drawStartingPoint = 0;
-
-          switch(orientation){
-
-            //for iphones
-            case 6: {
-
-              this.context.save();
-
-              // 90° rotate right
-              this.context.translate(len/2,len/2);
-              this.context.rotate(0.5 * Math.PI);
-              sX = y;
-              sY = (img.height - x- len);
-              drawStartingPoint = -len/2;
-              break;
-
-            }
-
-          }
-
           this.context.drawImage(img, sX, sY, len, len, drawStartingPoint, drawStartingPoint,len,len);
-          this.context.restore();
           return this.resultCanvas.toDataURL(this.outputImageFormat);
         }
 

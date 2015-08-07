@@ -66,11 +66,6 @@ angular.module('ngcrop').directive('cropImage',
                 if(angular.isDefined(newImage)){
 
                   properlyOrientImage(newImage);
-                  //if(angular.isFunction(scope.postCanvasImgProcessCallback)){
-                  //
-                  //  scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
-                  //
-                  //}
 
                 }
               }
@@ -118,8 +113,7 @@ angular.module('ngcrop').directive('cropImage',
 
                 var orientation = EXIF.getTag(image, 'Orientation');
 
-                if(orientation ===6){
-
+                if(orientation === 6){
 
                   var scale = Math.min ((2000 / image.width),(2000/ image.height), 1);
                   var tempCanvas = document.createElement('canvas');
@@ -128,7 +122,6 @@ angular.module('ngcrop').directive('cropImage',
                   var width = orientation == 6 ? image.height * scale : image.width * scale;
                   tempCanvas.height = height;
                   tempCanvas.width = width;
-                //  tempContext.save();
 
                   // 90° rotate right
                   tempContext.translate(width/2,height/2);
@@ -136,10 +129,11 @@ angular.module('ngcrop').directive('cropImage',
                   //draw the image to the canvas
                   var x = -(height/2);
                   var y = -(width/2);
+                  //draw the image
                   tempContext.drawImage(image,x,y,height,width);
-                  //tempContext.restore();
+                  //grab the image data and save as a newImage to pass to processNewImage
                   var source = tempCanvas.toDataURL();
-                  var newImage = new Image()
+                  var newImage = new Image();
                   newImage.onload = function(){
 
                     cropCanvas.processNewImage(this, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
@@ -147,7 +141,6 @@ angular.module('ngcrop').directive('cropImage',
                   }
 
                   newImage.src = source;
-                  // alert('orientation: ' + orientation + 'height: ' + this.canvas[0].height + 'width: ' + this.canvas[0].width);
 
                 }else{
 

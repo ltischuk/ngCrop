@@ -41,6 +41,18 @@
                 img.src = imageFileSrc;
 
               }
+
+              $scope.onCanvasImgProcess = function(){
+
+                $scope.$apply(function(){
+
+                  $scope.cropViewActivated = true;
+                  $scope.isReadyForCrop = true;
+
+                });
+
+              }
+
               $scope.crop = function(){
 
                 $scope.isReadyForCrop = false;
@@ -122,7 +134,15 @@
           Upload a file
         </button>
       </div>
-      <crop-image data-ng-show="isReadyForCrop && cropViewActivated" add-canvas-border="true" max-img-display-length="300" selector-color="#FF0000" selector-line-width="2" cropped-img-data="croppedImageDataUrl" orig-image="origImageFile"></crop-image>
+      <crop-image
+              data-ng-show="isReadyForCrop && cropViewActivated"
+              add-canvas-border="true"
+              max-img-display-length="300"
+              selector-color="#FF0000"
+              selector-line-width="2"
+              cropped-img-data="croppedImageDataUrl"
+              post-canvas-img-process-callback="onCanvasImgProcess()"
+              orig-image="origImageFile"></crop-image>
       <img data-ng-src="{{croppedImageDataUrl}}" data-ng-show="!isReadyForCrop && cropViewActivated" height="200px" width="200px">
     </div>
     <div class="row" data-ng-show="cropViewActivated" style="margin-top: 20px"></div>
