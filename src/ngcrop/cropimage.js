@@ -65,7 +65,7 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newImage)){
 
-                  cropCanvas.processNewImage(newImage, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
+                  properlyOrientImage(newImage);
                   //if(angular.isFunction(scope.postCanvasImgProcessCallback)){
                   //
                   //  scope.postCanvasImgProcessCallback({canvasInfo: cropCanvas.getCropCanvasInfo()});
@@ -91,6 +91,7 @@ angular.module('ngcrop').directive('cropImage',
 
             }
 
+
             //add the orientationchange event listener
             $window.addEventListener('orientationchange', orientationListener, false);
 
@@ -107,6 +108,53 @@ angular.module('ngcrop').directive('cropImage',
                 scope.postSelectorMoveCallback({selectorInfo: cropCanvas.getCropCanvasSelectorInfo()});
 
               }
+
+            }
+
+            function properlyOrientImage(image){
+
+
+              EXIF.getData(image, function(){
+
+                var orientation = EXIF.getTag(image, 'Orientation');
+
+                if(orientation ===6){
+
+
+                  var scale = Math.min ((2000 / image.width),(2000/ image.height), 1);
+                  var tempCanvas = document.createElement('canvas');
+                  var tempContext = tempCanvas.getContext('2d');
+                  var height = orientation == 6 ? image.width * scale : image.height * scale;
+                  var width = orientation == 6 ? image.height * scale : image.width * scale;
+                  tempCanvas.height = height;
+                  tempCanvas.width = width;
+                //  tempContext.save();
+
+                  // 90° rotate right
+                  tempContext.translate(width/2,height/2);
+                  tempContext.rotate(0.5 * Math.PI);
+                  //draw the image to the canvas
+                  var x = -(height/2);
+                  var y = -(width/2);
+                  tempContext.drawImage(image,x,y,height,width);
+                  //tempContext.restore();
+                  var source = tempCanvas.toDataURL();
+                  var newImage = new Image()
+                  newImage.onload = function(){
+
+                    cropCanvas.processNewImage(this, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
+
+                  }
+
+                  newImage.src = source;
+                  // alert('orientation: ' + orientation + 'height: ' + this.canvas[0].height + 'width: ' + this.canvas[0].width);
+
+                }else{
+
+                  cropCanvas.processNewImage(image, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
+                }
+
+              });
 
             }
 

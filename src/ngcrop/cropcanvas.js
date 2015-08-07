@@ -510,7 +510,6 @@ angular.module('ngcrop')
 
             var orientation = EXIF.getTag(img, 'Orientation');
             this.currentImgOrientation = (angular.isDefined(orientation) && orientation > 1) ? orientation : this.currentImgOrientation;
-            this.currentImgOrientation = 6;
 
             this.canvas[0].height = this.currentImgOrientation == 6 ? (img.width * this.imgScale) : (img.height * this.imgScale);
             this.canvas[0].width = this.currentImgOrientation == 6 ? (img.height * this.imgScale) : (img.width * this.imgScale);
