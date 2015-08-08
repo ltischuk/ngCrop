@@ -427,6 +427,7 @@ angular.module('ngcrop')
           var drawHeight = canvasHeight;
           var selectorMiddleX = this.cropSelector.x + (this.cropSelector.length/2);
           var selectorMiddleY = this.cropSelector.y + (this.cropSelector.length/2);
+          var arrowLength = this.cropSelector.length / 4;
 
           this.context.drawImage(this.currentImg,x,y,drawWidth,drawHeight);
 
@@ -445,6 +446,22 @@ angular.module('ngcrop')
           this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
           this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
           this.context.stroke();
+
+          //this.context.beginPath();
+          //this.context.lineWidth = 4;
+          //this.context.moveTo(this.cropSelector.x + arrowLength, this.cropSelector.y + arrowLength);
+          //this.context.lineTo(this.cropSelector.x + (arrowLength/4), this.cropSelector.y + (arrowLength/4));
+          //this.context.stroke();
+
+          this.context.beginPath();
+          this.context.lineWidth = 2;
+          this.context.moveTo(this.cropSelector.x + (arrowLength/4), this.cropSelector.y + (arrowLength/4));
+          this.context.lineTo(this.cropSelector.x + (arrowLength/2), this.cropSelector.y + (arrowLength/4));
+          this.context.lineTo(this.cropSelector.x + (arrowLength/4), this.cropSelector.y + (arrowLength/2));
+          this.context.lineTo(this.cropSelector.x + (arrowLength/4), this.cropSelector.y + (arrowLength/4));
+          this.context.closePath();
+          this.context.fillStyle = this.selectorColor;
+          this.context.fill();
 
 
         },
