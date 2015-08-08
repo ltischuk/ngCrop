@@ -391,6 +391,7 @@ angular.module('ngcrop')
           //turn selector guide variables off and output cropped image data from current selector location
           this.isSelecting = false;
           this.moveCorner = false;
+          this.cropSelector.resetCorner();
           this._drawCanvas();
           this.canvas[0].style.cursor = 'default';
           this.getCroppedImageData();

@@ -405,6 +405,7 @@ angular.module('ngcrop')
           //turn selector guide variables off and output cropped image data from current selector location
           this.isSelecting = false;
           this.moveCorner = false;
+          this.cropSelector.resetCorner();
           this._drawCanvas();
           this.canvas[0].style.cursor = 'default';
           this.getCroppedImageData();
@@ -707,7 +708,7 @@ angular.module('ngcrop')
       isInMoveZone : function(pointX, pointY){
 
         //find if point is in moveable territory and not in expandable/collapsable areas near corners
-        var moveZoneMinBound = this.length / 5;
+        var moveZoneMinBound = this.length / 8;
         var moveZoneMaxBound = this.length - moveZoneMinBound;
         if(pointX >= (this.x + moveZoneMinBound) && pointX <= (this.x + moveZoneMaxBound) &&
           pointY >= (this.y + moveZoneMinBound) && pointY <= (this.y + moveZoneMaxBound)){
@@ -907,7 +908,13 @@ angular.module('ngcrop')
 
         this.currentCorner = this.nearestCorner(mouseX, mouseY);
 
+      },
+      resetCorner: function(){
+
+        this.currentCorner = 0;
+
       }
+
 
     }
 

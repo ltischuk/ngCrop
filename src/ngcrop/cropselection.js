@@ -143,7 +143,7 @@ angular.module('ngcrop')
       isInMoveZone : function(pointX, pointY){
 
         //find if point is in moveable territory and not in expandable/collapsable areas near corners
-        var moveZoneMinBound = this.length / 5;
+        var moveZoneMinBound = this.length / 8;
         var moveZoneMaxBound = this.length - moveZoneMinBound;
         if(pointX >= (this.x + moveZoneMinBound) && pointX <= (this.x + moveZoneMaxBound) &&
           pointY >= (this.y + moveZoneMinBound) && pointY <= (this.y + moveZoneMaxBound)){
@@ -343,7 +343,13 @@ angular.module('ngcrop')
 
         this.currentCorner = this.nearestCorner(mouseX, mouseY);
 
+      },
+      resetCorner: function(){
+
+        this.currentCorner = 0;
+
       }
+
 
     }
 
