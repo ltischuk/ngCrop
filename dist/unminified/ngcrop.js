@@ -330,8 +330,8 @@ angular.module('ngcrop')
 
           e.preventDefault();
           var isMobile = (angular.isDefined(e.touches));
-          this.currentX = ((isMobile ? e.touches[0].clientX : e.clientX) - this.canvasLeftPos);
-          this.currentY = ((isMobile ? e.touches[0].clientY : e.clientY) - this.canvasTopPos);
+          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].pageX : e.clientX): e.clientX) - this.canvasLeftPos);
+          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].pageY : e.clientY) : e.clientY) - this.canvasTopPos);
           this.lastX = this.currentX;
           this.lastY = this.currentY;
           this.isSelecting = true;
@@ -364,8 +364,8 @@ angular.module('ngcrop')
 
           e.preventDefault();
           var isMobile = (angular.isDefined(e.touches));
-          this.currentX = ((isMobile ? e.touches[0].clientX  : e.clientX) - this.canvasLeftPos);
-          this.currentY = ((isMobile ? e.touches[0].clientY  : e.clientY) - this.canvasTopPos);
+          this.currentX = ((isMobile ? e.touches[0].clientX + window.scrollX  : e.clientX) - this.canvasLeftPos);
+          this.currentY = ((isMobile ? e.touches[0].clientY + window.scrollY : e.clientY) - this.canvasTopPos);
 
           //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
@@ -708,7 +708,7 @@ angular.module('ngcrop')
       isInMoveZone : function(pointX, pointY){
 
         //find if point is in moveable territory and not in expandable/collapsable areas near corners
-        var moveZoneMinBound = this.length / 8;
+        var moveZoneMinBound = this.length / 12;
         var moveZoneMaxBound = this.length - moveZoneMinBound;
         if(pointX >= (this.x + moveZoneMinBound) && pointX <= (this.x + moveZoneMaxBound) &&
           pointY >= (this.y + moveZoneMinBound) && pointY <= (this.y + moveZoneMaxBound)){
