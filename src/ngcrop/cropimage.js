@@ -29,6 +29,7 @@ angular.module('ngcrop').directive('cropImage',
             selectorStartX: '@?',
             selectorStartY: '@?',
             selectorStartLength: '@?',
+            startCanvasImgProcessCallback: '&?',
             postCanvasImgProcessCallback: '&?',
             postSelectorMoveCallback: '&?'
 
@@ -65,6 +66,11 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newImage)){
 
+                  if(angular.isDefined(scope.startCanvasImgProcessCallback && angular.isFunction(scope.startCanvasImgProcessCallback))){
+                    //call function in parent if required for starting to process image
+                    scope.startCanvasImgProcessCallback();
+
+                  }
                   properlyOrientImage(newImage);
 
                 }
