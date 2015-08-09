@@ -316,8 +316,8 @@ angular.module('ngcrop')
 
           e.preventDefault();
           var isMobile = (angular.isDefined(e.touches));
-          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].pageX : e.clientX): e.clientX) - this.canvasLeftPos);
-          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].pageY : e.clientY) : e.clientY) - this.canvasTopPos);
+          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].pageX : e.clientX + window.scrollX)  : e.clientX + window.scrollX) - this.canvasLeftPos);
+          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].pageY : e.clientY + window.scrollY)  : e.clientY + window.scrollY) - this.canvasTopPos);
           this.lastX = this.currentX;
           this.lastY = this.currentY;
           this.isSelecting = true;
@@ -350,8 +350,8 @@ angular.module('ngcrop')
 
           e.preventDefault();
           var isMobile = (angular.isDefined(e.touches));
-          this.currentX = ((isMobile ? e.touches[0].clientX + window.scrollX  : e.clientX) - this.canvasLeftPos);
-          this.currentY = ((isMobile ? e.touches[0].clientY + window.scrollY : e.clientY) - this.canvasTopPos);
+          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].pageX : e.clientX + window.scrollX)  : e.clientX + window.scrollX) - this.canvasLeftPos);
+          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].pageY : e.clientY + window.scrollY)  : e.clientY + window.scrollY) - this.canvasTopPos);
 
           //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
@@ -433,12 +433,6 @@ angular.module('ngcrop')
           this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
           this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
           this.context.stroke();
-
-          //this.context.beginPath();
-          //this.context.lineWidth = 4;
-          //this.context.moveTo(this.cropSelector.x + arrowLength, this.cropSelector.y + arrowLength);
-          //this.context.lineTo(this.cropSelector.x + (arrowLength/4), this.cropSelector.y + (arrowLength/4));
-          //this.context.stroke();
 
           this.context.beginPath();
           this.context.lineWidth = 2;
