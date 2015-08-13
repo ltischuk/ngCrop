@@ -31,6 +31,7 @@ See the sample test page for an example.  You can view the sample page by runnin
 * selectorStartX: (optional) initial x coordinate on canvas to draw the selector square (useful is saving off previous value from callback to redraw later)
 * selectorStartY: (optional) initial y coordinate on canvas to draw the selector square
 * selectorStartLength: (optional) initial length coordinate on canvas to draw the selector square
+* startCanvasImgProcessCallback: (optional) function to call once a new image is detected and processing starts to draw the image on canvas
 * postCanvasImgProcessCallback: (optional) function to call once the canvas has processed and drawn a new image with the selector square on top of it.<br>
  Additionally, returns a convenience object containing properties: width and height of the shown canvas
 * postSelectorMoveCallback: (optional) function to call once the selector is drawn and/or changed on the canvas 

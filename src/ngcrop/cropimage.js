@@ -112,9 +112,18 @@ angular.module('ngcrop').directive('cropImage',
 
             }
 
+            /**
+             * Orients the image - iPhone images are often stored oriented 90 degrees counterclockwise
+             * This function will check if the image is oriented in that way and if so creates a new image from
+             * a temporary canvas (and additionally scales the image to a max of 2000 pixels in width or height -
+             * to accommodate max drawing size on HTML5 canvases - then the new image that is created from getDataURL is
+             * saved on the scope as the origImage)
+             * @param image
+             */
             function properlyOrientImage(image){
 
 
+              //get the EXIF data from the image and if orientation is 6, then rotate the image
               EXIF.getData(image, function(){
 
                 var orientation = EXIF.getTag(image, 'Orientation');
