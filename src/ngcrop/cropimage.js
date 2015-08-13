@@ -5,11 +5,20 @@
  * restricted to elements
  * Receives options:
  * origImage - required input that is two-way bound to controller variable and is an Image object (the image to crop)
- * maxImgDisplayLength - max length in pixels to confine the canvas to in the DOM
- * croppedImgData: required input that is two-way bound to controller variable and is a DataURL of cropped image data
- * addCanvasBorder: boolean value (true or false) to turn on/off a 2px black border around canvas
- * selectorColor: string hex value of color for the selector square
- * selectorLineWidth: number value of border width in pixels
+ * maxImgDisplayLength - (optional) max length in pixels to confine the canvas to in the DOM
+ * croppedImgData: (optional) required input that is two-way bound to controller variable and is a DataURL of cropped image data
+ * addCanvasBorder: (optional) boolean value (true or false) to turn on/off a 2px black border around canvas
+ * selectorColor: (optional)string hex value of color for the selector square
+ * selectorLineWidth: (optional) number value of border width in pixels
+ * selectorStartX: (optional) placement x coordinate to draw the selector square - useful if saving coordinates for redrawing
+ * selectorStartY: (optional) placement y coordinate to draw the selector square - useful if saving coordinates for redrawing
+ * selectorStartLength: (optional) length of selector square to adhere to - useful if saving coordinates for redrawing
+ * startCanvasImgProcessCallback: (optional) upon processing a new image, this is a function to call
+ * postCanvasImgProcessCallback: (optional) upon finishing processing an image, this is a function to call
+ *  - this function will return an object with width, height coordinates of the canvas
+ * postSelectorMoveCallback: (optional) callback function to execute on each move of the selector square
+ *  - this function will return an object with x,y,length and scale of the selector square.
+ *  - The scale is the relation of the size of the square to the original image, since the image may be scaled down for drawing on the canvas
  *
  */
 angular.module('ngcrop').directive('cropImage',

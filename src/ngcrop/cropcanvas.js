@@ -299,13 +299,6 @@ angular.module('ngcrop')
 
           });
 
-          ////touchcancel event
-          //this.canvas.on('touchcancel', function(e){
-          //
-          //  that._handleUp(e);
-          //
-          //});
-
       },
         /**
          * Method to encapsulate functionality for when mousedown or touchstart event is fired
@@ -532,7 +525,6 @@ angular.module('ngcrop')
           this.canvas.off('touchmove',this._handleMove);
           this.canvas.off('touchleave',this._handleUp);
           this.canvas.off('touchend',this._handleUp);
-          this.canvas.off('touchcancel',this._handleUp);
           this.canvas.remove();
 
         }
