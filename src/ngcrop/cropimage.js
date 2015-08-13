@@ -83,7 +83,12 @@ angular.module('ngcrop').directive('cropImage',
              */
             var orientationListener = function(){
 
-              properlyOrientImage(scope.origImage);
+              //android returns wrong values so we must set a timeout so that it properly orients screen
+              //otherwise wrong points for selector square are set and touch events act strange
+              setTimeout(function(){
+                properlyOrientImage(scope.origImage);
+              },200);
+
 
             }
 

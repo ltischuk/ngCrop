@@ -313,12 +313,12 @@ angular.module('ngcrop')
 
           });
 
-          //touchcancel event
-          this.canvas.on('touchcancel', function(e){
-
-            that._handleUp(e);
-
-          });
+          ////touchcancel event
+          //this.canvas.on('touchcancel', function(e){
+          //
+          //  that._handleUp(e);
+          //
+          //});
 
       },
         /**
@@ -364,8 +364,8 @@ angular.module('ngcrop')
 
           e.preventDefault();
           var isMobile = (angular.isDefined(e.touches));
-          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].pageX : e.clientX + window.scrollX)  : e.clientX + window.scrollX) - this.canvasLeftPos);
-          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].pageY : e.clientY + window.scrollY)  : e.clientY + window.scrollY) - this.canvasTopPos);
+          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].clientX : e.clientX)  : e.clientX) - this.canvasLeftPos);
+          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].clientY : e.clientY)  : e.clientY) - this.canvasTopPos);
 
           //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
@@ -1001,7 +1001,10 @@ angular.module('ngcrop').directive('cropImage',
              */
             var orientationListener = function(){
 
-              properlyOrientImage(scope.origImage);
+              setTimeout(function(){
+                properlyOrientImage(scope.origImage);
+              },200);
+
 
             }
 
