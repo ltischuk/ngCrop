@@ -308,9 +308,13 @@ angular.module('ngcrop')
         _handleDown: function(e){
 
           e.preventDefault();
-          var isMobile = (angular.isDefined(e.touches));
-          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].pageX : e.clientX + window.scrollX)  : e.clientX + window.scrollX) - this.canvasLeftPos);
-          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].pageY : e.clientY + window.scrollY)  : e.clientY + window.scrollY) - this.canvasTopPos);
+          var currentEvent = angular.isDefined(e.touches) ? e.touches[0] : e;
+          var scrollX = document.body && document.body.scrollLeft !== null ? document.body.scrollLeft : document.documentElement.scrollLeft;
+          var scrollY = document.body && document.body.scrollTop !== null ? document.body.scrollTop : document.documentElement.scrollTop;;
+
+          this.currentX = ((currentEvent.pageX ? currentEvent.pageX : e.clientX + scrollX) - this.canvasLeftPos);
+          this.currentY = ((currentEvent.pageY ? currentEvent.pageY : e.clientY + scrollY) - this.canvasTopPos);
+
           this.lastX = this.currentX;
           this.lastY = this.currentY;
           this.isSelecting = true;
@@ -342,9 +346,12 @@ angular.module('ngcrop')
         _handleMove: function(e){
 
           e.preventDefault();
-          var isMobile = (angular.isDefined(e.touches));
-          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].clientX : e.clientX)  : e.clientX) - this.canvasLeftPos);
-          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].clientY : e.clientY)  : e.clientY) - this.canvasTopPos);
+          var currentEvent = angular.isDefined(e.touches) ? e.touches[0] : e;
+          var scrollX = document.body && document.body.scrollLeft !== null ? document.body.scrollLeft : document.documentElement.scrollLeft;
+          var scrollY = document.body && document.body.scrollTop !== null ? document.body.scrollTop : document.documentElement.scrollTop;;
+
+          this.currentX = ((currentEvent.pageX ? currentEvent.pageX : e.clientX + scrollX) - this.canvasLeftPos);
+          this.currentY = ((currentEvent.pageY ? currentEvent.pageY : e.clientY + scrollY) - this.canvasTopPos);
 
           //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
@@ -427,12 +434,13 @@ angular.module('ngcrop')
           this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
           this.context.stroke();
 
+          //draw an error in the bottom lefthand corner
           this.context.beginPath();
           this.context.lineWidth = 2;
-          this.context.moveTo(this.cropSelector.x + (arrowLength/4), this.cropSelector.y + (arrowLength/4));
-          this.context.lineTo(this.cropSelector.x + (arrowLength/2), this.cropSelector.y + (arrowLength/4));
-          this.context.lineTo(this.cropSelector.x + (arrowLength/4), this.cropSelector.y + (arrowLength/2));
-          this.context.lineTo(this.cropSelector.x + (arrowLength/4), this.cropSelector.y + (arrowLength/4));
+          this.context.moveTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/2)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/2)));
+          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
           this.context.closePath();
           this.context.fillStyle = this.selectorColor;
           this.context.fill();

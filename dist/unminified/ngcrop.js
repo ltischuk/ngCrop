@@ -313,13 +313,6 @@ angular.module('ngcrop')
 
           });
 
-          ////touchcancel event
-          //this.canvas.on('touchcancel', function(e){
-          //
-          //  that._handleUp(e);
-          //
-          //});
-
       },
         /**
          * Method to encapsulate functionality for when mousedown or touchstart event is fired
@@ -329,9 +322,13 @@ angular.module('ngcrop')
         _handleDown: function(e){
 
           e.preventDefault();
-          var isMobile = (angular.isDefined(e.touches));
-          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].pageX : e.clientX + window.scrollX)  : e.clientX + window.scrollX) - this.canvasLeftPos);
-          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].pageY : e.clientY + window.scrollY)  : e.clientY + window.scrollY) - this.canvasTopPos);
+          var currentEvent = angular.isDefined(e.touches) ? e.touches[0] : e;
+          var scrollX = document.body && document.body.scrollLeft !== null ? document.body.scrollLeft : document.documentElement.scrollLeft;
+          var scrollY = document.body && document.body.scrollTop !== null ? document.body.scrollTop : document.documentElement.scrollTop;;
+
+          this.currentX = ((currentEvent.pageX ? currentEvent.pageX : e.clientX + scrollX) - this.canvasLeftPos);
+          this.currentY = ((currentEvent.pageY ? currentEvent.pageY : e.clientY + scrollY) - this.canvasTopPos);
+
           this.lastX = this.currentX;
           this.lastY = this.currentY;
           this.isSelecting = true;
@@ -363,9 +360,12 @@ angular.module('ngcrop')
         _handleMove: function(e){
 
           e.preventDefault();
-          var isMobile = (angular.isDefined(e.touches));
-          this.currentX = ((isMobile ? (e.touches[0].pageX ? e.touches[0].clientX : e.clientX)  : e.clientX) - this.canvasLeftPos);
-          this.currentY = ((isMobile ? (e.touches[0].pageY ? e.touches[0].clientY : e.clientY)  : e.clientY) - this.canvasTopPos);
+          var currentEvent = angular.isDefined(e.touches) ? e.touches[0] : e;
+          var scrollX = document.body && document.body.scrollLeft !== null ? document.body.scrollLeft : document.documentElement.scrollLeft;
+          var scrollY = document.body && document.body.scrollTop !== null ? document.body.scrollTop : document.documentElement.scrollTop;;
+
+          this.currentX = ((currentEvent.pageX ? currentEvent.pageX : e.clientX + scrollX) - this.canvasLeftPos);
+          this.currentY = ((currentEvent.pageY ? currentEvent.pageY : e.clientY + scrollY) - this.canvasTopPos);
 
           //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
@@ -458,6 +458,16 @@ angular.module('ngcrop')
           this.context.fillStyle = this.selectorColor;
           this.context.fill();
 
+          this.context.beginPath();
+          this.context.lineWidth = 2;
+          this.context.moveTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/2)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/2)));
+          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          this.context.closePath();
+          this.context.fillStyle = this.selectorColor;
+          this.context.fill();
+
 
         },
         /**
@@ -546,7 +556,6 @@ angular.module('ngcrop')
           this.canvas.off('touchmove',this._handleMove);
           this.canvas.off('touchleave',this._handleUp);
           this.canvas.off('touchend',this._handleUp);
-          this.canvas.off('touchcancel',this._handleUp);
           this.canvas.remove();
 
         }
@@ -922,12 +931,21 @@ angular.module('ngcrop')
  * Adds functionality to an HTML5 canvas element
  * restricted to elements
  * Receives options:
- * origImage - required input that is two-way bound to controller variable and is an Image object (the image to crop)
- * maxImgDisplayLength - max length in pixels to confine the canvas to in the DOM
- * croppedImgData: required input that is two-way bound to controller variable and is a DataURL of cropped image data
- * addCanvasBorder: boolean value (true or false) to turn on/off a 2px black border around canvas
- * selectorColor: string hex value of color for the selector square
- * selectorLineWidth: number value of border width in pixels
+ * origImage: required input that is two-way bound to controller variable and is an Image object (the image to crop)
+ * maxImgDisplayLength: (optional) max length in pixels to confine the canvas to in the DOM
+ * croppedImgData: (optional) required input that is two-way bound to controller variable and is a DataURL of cropped image data
+ * addCanvasBorder: (optional) boolean value (true or false) to turn on/off a 2px black border around canvas
+ * selectorColor: (optional)string hex value of color for the selector square
+ * selectorLineWidth: (optional) number value of border width in pixels
+ * selectorStartX: (optional) placement x coordinate to draw the selector square - useful if saving coordinates for redrawing
+ * selectorStartY: (optional) placement y coordinate to draw the selector square - useful if saving coordinates for redrawing
+ * selectorStartLength: (optional) length of selector square to adhere to - useful if saving coordinates for redrawing
+ * startCanvasImgProcessCallback: (optional) upon processing a new image, this is a function to call
+ * postCanvasImgProcessCallback: (optional) upon finishing processing an image, this is a function to call
+ *  - this function will return an object with width, height coordinates of the canvas
+ * postSelectorMoveCallback: (optional) callback function to execute on each move of the selector square
+ *  - this function will return an object with x,y,length and scale of the selector square.
+ *  - The scale is the relation of the size of the square to the original image, since the image may be scaled down for drawing on the canvas
  *
  */
 angular.module('ngcrop').directive('cropImage',
@@ -953,21 +971,21 @@ angular.module('ngcrop').directive('cropImage',
 
           },
           template: '<canvas></canvas>',
-          link: function (scope, element) {
+          link: function (scope, element, attrs) {
 
             // variables assess and set accordingly
-            scope.selectorColor = angular.isDefined(scope.selectorColor) ? scope.selectorColor : '#ff0000';
-            scope.selectorLineWidth = angular.isDefined(scope.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
-            scope.croppedImgFormat = 'image/' + (angular.isDefined(scope.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
+            scope.selectorColor = angular.isDefined(attrs.selectorColor) ? scope.selectorColor : '#ff0000';
+            scope.selectorLineWidth = angular.isDefined(attrs.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
+            scope.croppedImgFormat = 'image/' + (angular.isDefined(attrs.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
 
             //maximum length of the canvas
-            var maxCanvasLength = angular.isDefined(scope.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
+            var maxCanvasLength = angular.isDefined(attrs.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
 
             //find canvas element on DOM
             var cvs = element.find('canvas');
 
             // add a border to the canvas if parameter exists
-            if(angular.isDefined(scope.addCanvasBorder) && scope.addCanvasBorder === 'true'){
+            if(angular.isDefined(attrs.addCanvasBorder) && scope.addCanvasBorder === 'true'){
 
               cvs.css({
                 border: 'solid 2px #000000'
@@ -984,7 +1002,7 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newImage)){
 
-                  if(angular.isDefined(scope.startCanvasImgProcessCallback && angular.isFunction(scope.startCanvasImgProcessCallback))){
+                  if(angular.isDefined(attrs.startCanvasImgProcessCallback) && angular.isFunction(scope.startCanvasImgProcessCallback)){
                     //call function in parent if required for starting to process image
                     scope.startCanvasImgProcessCallback();
 
@@ -1001,6 +1019,8 @@ angular.module('ngcrop').directive('cropImage',
              */
             var orientationListener = function(){
 
+              //android returns wrong values so we must set a timeout so that it properly orients screen
+              //otherwise wrong points for selector square are set and touch events act strange
               setTimeout(function(){
                 properlyOrientImage(scope.origImage);
               },200);
@@ -1020,7 +1040,7 @@ angular.module('ngcrop').directive('cropImage',
 
               scope.croppedImgData = imageData;
 
-              if(angular.isFunction(scope.postSelectorMoveCallback)) {
+              if(angular.isDefined(attrs.postSelectorMoveCallback) && angular.isFunction(scope.postSelectorMoveCallback)) {
 
                 scope.postSelectorMoveCallback({selectorInfo: cropCanvas.getCropCanvasSelectorInfo()});
 
@@ -1028,9 +1048,18 @@ angular.module('ngcrop').directive('cropImage',
 
             }
 
+            /**
+             * Orients the image - iPhone images are often stored oriented 90 degrees counterclockwise
+             * This function will check if the image is oriented in that way and if so creates a new image from
+             * a temporary canvas (and additionally scales the image to a max of 2000 pixels in width or height -
+             * to accommodate max drawing size on HTML5 canvases - then the new image that is created from getDataURL is
+             * saved on the scope as the origImage)
+             * @param image
+             */
             function properlyOrientImage(image){
 
 
+              //get the EXIF data from the image and if orientation is 6, then rotate the image
               EXIF.getData(image, function(){
 
                 var orientation = EXIF.getTag(image, 'Orientation');

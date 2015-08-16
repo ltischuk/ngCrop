@@ -4,8 +4,8 @@
  * Adds functionality to an HTML5 canvas element
  * restricted to elements
  * Receives options:
- * origImage - required input that is two-way bound to controller variable and is an Image object (the image to crop)
- * maxImgDisplayLength - (optional) max length in pixels to confine the canvas to in the DOM
+ * origImage: required input that is two-way bound to controller variable and is an Image object (the image to crop)
+ * maxImgDisplayLength: (optional) max length in pixels to confine the canvas to in the DOM
  * croppedImgData: (optional) required input that is two-way bound to controller variable and is a DataURL of cropped image data
  * addCanvasBorder: (optional) boolean value (true or false) to turn on/off a 2px black border around canvas
  * selectorColor: (optional)string hex value of color for the selector square
@@ -44,21 +44,21 @@ angular.module('ngcrop').directive('cropImage',
 
           },
           template: '<canvas></canvas>',
-          link: function (scope, element) {
+          link: function (scope, element, attrs) {
 
             // variables assess and set accordingly
-            scope.selectorColor = angular.isDefined(scope.selectorColor) ? scope.selectorColor : '#ff0000';
-            scope.selectorLineWidth = angular.isDefined(scope.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
-            scope.croppedImgFormat = 'image/' + (angular.isDefined(scope.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
+            scope.selectorColor = angular.isDefined(attrs.selectorColor) ? scope.selectorColor : '#ff0000';
+            scope.selectorLineWidth = angular.isDefined(attrs.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
+            scope.croppedImgFormat = 'image/' + (angular.isDefined(attrs.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
 
             //maximum length of the canvas
-            var maxCanvasLength = angular.isDefined(scope.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
+            var maxCanvasLength = angular.isDefined(attrs.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
 
             //find canvas element on DOM
             var cvs = element.find('canvas');
 
             // add a border to the canvas if parameter exists
-            if(angular.isDefined(scope.addCanvasBorder) && scope.addCanvasBorder === 'true'){
+            if(angular.isDefined(attrs.addCanvasBorder) && scope.addCanvasBorder === 'true'){
 
               cvs.css({
                 border: 'solid 2px #000000'
@@ -75,7 +75,7 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newImage)){
 
-                  if(angular.isDefined(scope.startCanvasImgProcessCallback && angular.isFunction(scope.startCanvasImgProcessCallback))){
+                  if(angular.isDefined(attrs.startCanvasImgProcessCallback) && angular.isFunction(scope.startCanvasImgProcessCallback)){
                     //call function in parent if required for starting to process image
                     scope.startCanvasImgProcessCallback();
 
@@ -113,7 +113,7 @@ angular.module('ngcrop').directive('cropImage',
 
               scope.croppedImgData = imageData;
 
-              if(angular.isFunction(scope.postSelectorMoveCallback)) {
+              if(angular.isDefined(attrs.postSelectorMoveCallback) && angular.isFunction(scope.postSelectorMoveCallback)) {
 
                 scope.postSelectorMoveCallback({selectorInfo: cropCanvas.getCropCanvasSelectorInfo()});
 
