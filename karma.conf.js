@@ -13,6 +13,7 @@ module.exports = function(config) {
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'src/ngcrop/ngcrop.js',
+      'src/ngcrop/exif.js',
       'src/ngcrop/*.js',
       'src/ngcrop/test/**/*.spec.js',
       {pattern: 'sample/*.jpeg', included: false, served: true}

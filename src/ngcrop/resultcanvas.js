@@ -31,21 +31,16 @@ angular.module('ngcrop')
          * @param len
          * @returns {*}
          */
-        getDataUrl: function (img, x, y, len) {
+        getDataUrl: function (img, x, y, len, orientation) {
 
           //draw the image to the canvas and pull display info
           this.resultCanvas.height = len;
           this.resultCanvas.width = len;
-          this.context.drawImage(img, x, y, len, len, 0, 0,len,len);
+          var sX = x;
+          var sY = y;
+          var drawStartingPoint = 0;
+          this.context.drawImage(img, sX, sY, len, len, drawStartingPoint, drawStartingPoint,len,len);
           return this.resultCanvas.toDataURL(this.outputImageFormat);
-        },
-        /**
-         * Remove the canvas from the DOM
-         */
-        destroy: function(){
-
-          this.resultCanvas.remove();
-
         }
 
     }

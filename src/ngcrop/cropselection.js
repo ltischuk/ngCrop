@@ -100,18 +100,38 @@ angular.module('ngcrop')
       },
       /**
        * Set the selector dimensions given a new canvas (parent) width and height
-       * @param img
+       * @param parentWidth
+       * @param parentHeight
+       * @param (optional) startX - starting value of X within the canvas dimensions
+       * @param (optional) startY - starting value of Y within the canvas dimensions
+       * @param (optional) startLength - starting value of length within the canvas dimensions
+       *
        */
-      initSelectorDimensions : function(parentWidth, parentHeight){
+      initSelectorDimensions : function(parentWidth, parentHeight, startX, startY, startLength){
 
         this.maxX = parentWidth - this.outerCushion;
         this.maxY = parentHeight - this.outerCushion;
 
-        //position selector in the center of the parent canvas
-        var minLenValue = Math.min(parentWidth, parentHeight);
-        this.x = (this.maxX / 2) - (minLenValue/4);
-        this.y = (minLenValue/4);
-        this.length = minLenValue/2;
+        startX = Number(startX);
+        startY = Number(startY);
+        startLength = Number(startLength);
+
+        if(angular.isDefined(startX) && angular.isDefined(startY) && angular.isDefined(startLength) &&
+        isFinite(startX), isFinite(startY), isFinite(startLength) && startLength > 0){
+
+          this.x = startX;
+          this.y = startY;
+          this.length = startLength;
+
+        }else{
+
+          //position selector in the center of the parent canvas
+          var minLenValue = Math.min(parentWidth, parentHeight);
+          this.x = (this.maxX / 2) - (minLenValue/4);
+          this.y = (minLenValue/4);
+          this.length = minLenValue/2;
+
+        }
 
       },
       /**
@@ -123,7 +143,7 @@ angular.module('ngcrop')
       isInMoveZone : function(pointX, pointY){
 
         //find if point is in moveable territory and not in expandable/collapsable areas near corners
-        var moveZoneMinBound = this.length / 5;
+        var moveZoneMinBound = this.length / 12;
         var moveZoneMaxBound = this.length - moveZoneMinBound;
         if(pointX >= (this.x + moveZoneMinBound) && pointX <= (this.x + moveZoneMaxBound) &&
           pointY >= (this.y + moveZoneMinBound) && pointY <= (this.y + moveZoneMaxBound)){
@@ -323,8 +343,12 @@ angular.module('ngcrop')
 
         this.currentCorner = this.nearestCorner(mouseX, mouseY);
 
-      }
+      },
+      resetCorner: function(){
 
+        this.currentCorner = 0;
+
+      }
 
 
     }

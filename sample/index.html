@@ -1,76 +1,167 @@
 <html ng-app="demo">
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <style>
+    .hideme {
+      visibility: hidden;
+    }
+
+  </style>
   <title title>NgCrop Example</title>
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-  <script src="../bower_components/angular/angular.min.js"></script>
-  <script src="../bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
-  <script src="../bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.28/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.js"></script>
   <script src="../dist/unminified/ngcrop.js"></script>
   <script type="text/javascript">
     var app = angular.module('demo', ['ngcrop']);
     app
-      .controller('ngcropDemoController', function($scope) {
-        $scope.origImageFile = undefined;
-        $scope.isReadyForCrop = false;
-        $scope.croppedImageDataUrl = undefined;
+            .controller('ngcropDemoController', function($scope) {
+              $scope.origImageFile = undefined;
+              $scope.isReadyForCrop = false;
+              $scope.croppedImageDataUrl = undefined;
+              $scope.cropViewActivated = false;
 
-        var image = new Image();
-        image.onload = function(){
 
-            $scope.origImageFile = this;
+              $scope.handleFileButtonClick = function(id){
 
-          $scope.$apply(function(){
+                document.getElementById(id).click();
 
-            $scope.isReadyForCrop = true;
+              }
 
-          });
+              $scope.updateImageView = function(imageFileSrc){
 
-        };
-        image.src = 'testimage.jpeg';
+                var img = new Image();
+                img.onload = function () {
 
-        $scope.crop = function(){
+                  var newImg = this;
+                  $scope.$apply(
+                    function() {
+                      $scope.origImageFile = newImg;
+                      $scope.isReadyForCrop = true;
+                      $scope.cropViewActivated = true;
+                    });
 
-          $scope.isReadyForCrop = false;
+                }
+                img.src = imageFileSrc;
 
-        }
+              }
 
-        $scope.revertCrop = function(){
+              $scope.onCanvasImgProcess = function(){
 
-          $scope.isReadyForCrop = true;
+                $scope.cropViewActivated = true;
 
-        }
+              }
 
-      })
+              $scope.crop = function(){
+
+                $scope.isReadyForCrop = false;
+
+              }
+
+              $scope.revertCrop = function(){
+
+                $scope.isReadyForCrop = true;
+
+              }
+
+            })
+            .directive('filereader',
+            function () {
+
+              return {
+
+                restrict: 'A'
+                ,scope : {
+                  onFileUpload: '&'
+                }
+                ,link: function (scope, elem, attrs) {
+
+                  var reader = new FileReader();
+                  reader.onload = function (e) {
+
+                    if (scope.onFileUpload) {
+                      scope.onFileUpload({file: e.target.result});
+                    }
+                  }
+
+                  elem.on('change', function () {
+                    var file = elem[0].files[0];
+
+                    if (!isValidFile(file)) {
+
+                      //show a modal
+
+                    } else {
+
+                      reader.readAsDataURL(file);
+                    }
+
+                  });
+
+                  /**
+                   * isValidFile - method to determine if a file is valid
+                   * @param file
+                   * @returns {boolean}
+                   */
+                  function isValidFile(file) {
+                    if (!file || !file.size || !file.type) {
+                      return false;
+                    }
+                    return true;
+                  }
+
+                }
+
+              }
+
+
+            });
   </script>
 </head>
 <body ng-controller="ngcropDemoController">
 <div>
-  <div class="row">
-    <div class="col-xs-12">
-      <h2 style="text-align: center">Drag corners to expand and/or collapse or click and drag center to move entire square</h2>
-    </div>
-  </div>
-  <div class="row">
+  <h2 style="text-align: center">Drag corners to expand and/or collapse or click and drag center to move entire square</h2>
+  <div>
     <div style="text-align: center">
-      <crop-image data-ng-show="isReadyForCrop" add-canvas-border="true" max-img-display-length="900" selector-color="#FF0000" selector-line-width="2" cropped-img-data="croppedImageDataUrl" orig-image="origImageFile"></crop-image>
-      <img data-ng-src="{{croppedImageDataUrl}}" data-ng-show="!isReadyForCrop" height="200px" width="200px">
-    </div>
-    <div class="row" style="margin-top: 20px"></div>
-    <div class="row">
-      <div class="col-xs-8 col-xs-offset-2 col-sm-2 col-sm-offset-5" data-ng-show="isReadyForCrop">
+      <div data-ng-show="!cropViewActivated" class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5">
+        <input type="file" id="mainuploadfile" data-ng-show="false" accept="image/jpeg, image/JPG, image/JPEG, image/jpeg" filereader
+               on-file-upload="updateImageView(file)" capture="camera" image-file="image" />
         <button
-          on-tap
-          class="btn btn-deep-red btn-block"
-          data-ng-click="crop()">
+                on-tap
+                class="btn btn-block"
+                data-ng-click="handleFileButtonClick('mainuploadfile')">
+          Upload a file
+        </button>
+      </div>
+      <crop-image
+              data-ng-show="isReadyForCrop"
+              data-ng-class="{'hideme' : !cropViewActivated}"
+              add-canvas-border="true"
+              max-img-display-length="300"
+              selector-color="#FF0000"
+              selector-line-width="2"
+              cropped-img-data="croppedImageDataUrl"
+              post-canvas-img-process-callback="onCanvasImgProcess(canvasInfo)"
+              orig-image="origImageFile"></crop-image>
+      <img data-ng-src="{{croppedImageDataUrl}}" data-ng-show="!isReadyForCrop && cropViewActivated" height="200px" width="200px">
+    </div>
+    <div class="row" data-ng-show="cropViewActivated" style="margin-top: 20px"></div>
+    <div class="row" data-ng-show="cropViewActivated">
+      <div class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5" data-ng-show="isReadyForCrop">
+        <button
+                on-tap
+                class="btn btn-deep-red btn-block"
+                data-ng-click="crop()">
           Crop
         </button>
       </div>
-      <div class="col-xs-8 col-xs-offset-2 col-sm-2 col-sm-offset-5" data-ng-show="!isReadyForCrop">
+      <div class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5" data-ng-show="!isReadyForCrop">
         <button
-          on-tap
-          class="btn btn-deep-red btn-block"
-          data-ng-click="revertCrop()">
+                on-tap
+                class="btn btn-deep-red btn-block"
+                data-ng-click="revertCrop()">
           Revert
         </button>
       </div>

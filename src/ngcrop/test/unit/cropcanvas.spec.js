@@ -41,11 +41,10 @@ describe('Directive: CropCanvas', function() {
     // Check that the compiled element contains the templated content
     var canvasElem = element.find('canvas');
     var maxLength = 300;
-    var cropCanvas = new CropCanvas(canvasElem, maxLength,2,"#000000","image/jpeg" );
+    var cropCanvas = new CropCanvas(canvasElem, maxLength,2,"#000000","image/jpeg",resultFunction );
     spyOn(cropCanvas, "getCroppedImageData");
-    cropCanvas.processNewImage(testImg,resultFunction);
+    cropCanvas.processNewImage(testImg,undefined,undefined,undefined,resultFunction);
     expect(cropCanvas.getCroppedImageData).toHaveBeenCalled();
-
 
   });
 
