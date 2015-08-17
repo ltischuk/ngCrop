@@ -14,21 +14,22 @@ angular.module('ngcrop')
 
       /**
        * Class to control the crop canvas which controls the main canvas and
-       * @param canvasElement
-       * @param maxLength
-       * @param selectorWidth
-       * @param selectorColor
-       * @param outputImageFormat
+       * @param canvasElement - the canvasElement to draw on
+       * @param maxLength - maximum length of the canvas
+       * @param selectorLineWidth - the selector square line width
+       * @param selectorColor - the selector square color
+       * @param outputImageFormat - the format of the resulting cropped image
+       * @param onCropResult - callback to execute after selector square move is complete
        * @constructor
        */
-      function CropCanvas(canvasElement, maxLength, selectorWidth, selectorColor, outputImageFormat, onCropResult){
+      function CropCanvas(canvasElement, maxLength, selectorLineWidth, selectorColor, outputImageFormat, onCropResult){
 
         this.canvas = canvasElement;
         this.context = canvasElement[0].getContext('2d');
         this.resultCanvas = angular.isDefined(outputImageFormat) ? new ResultCanvas(outputImageFormat): new ResultCanvas('image/png');
         this.maxLength = maxLength;
         this.cropSelector = new CropSelection(maxLength);
-        this.selectorLineWidth = selectorWidth;
+        this.selectorLineWidth = selectorLineWidth;
         this.selectorColor = selectorColor;
         this.imgScale = 1;
         this.isSelecting = false;
@@ -398,7 +399,7 @@ angular.module('ngcrop')
 
         },
         /**
-         * Method to redraw the canvas
+         * Method to redraw the canvas, image and selector square
          * @private
          */
         _drawCanvas: function(){

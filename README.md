@@ -5,9 +5,11 @@ An AngularJS module for image cropping
 ## Overview
 
 ngCrop is an AngularJS module that provides a directive for image cropping within web browsers using the HTML5 canvas element.
-The directive operates by inserting an HTML5 canvas on the DOM and drawing an image file that is bound to the isolate scope
-of the directive.  The directive watches for new images to update the canvas.  Please use this code at your own discretion.
-<br><b>UPDATE: This module now is now fully featured to support cropping on both desktop and mobile devices.</b>
+The directive operates by inserting an HTML5 canvas on the DOM and drawing an image file <br> that is bound to the isolate scope
+of the directive. A selector square is drawn on the image for users to designate a desired crop area on the image.
+The directive watches for new images to update the canvas. <br> Please use this code at your own discretion.
+<br><b>UPDATE: This module now is now fully featured to support cropping on both desktop and mobile devices.</b><br>
+FYI: Firefox on mobile Android has issues with file input elements, so uploading a file using the demo may not work in that situation.
 
 ## Requirements
 
