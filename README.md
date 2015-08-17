@@ -17,7 +17,7 @@ of the directive.  The directive watches for new images to update the canvas.  P
 ## Download/Install Instructions
 Download the distribution file or if using Bower, add as a dependency in your bower.json file.  
 Add ngcrop as a module dependency in your main application js file and then attach the ngcrop directive to an HTML element in your application.  
-See the sample test page for an example.  You can view the sample page by running the <code> gulp serve </code> command.
+See the sample test page for an example.  You can view the sample page by running the <code> gulp build </code> command followed by <code> gulp serve </code>.
 
 ## Options
 
