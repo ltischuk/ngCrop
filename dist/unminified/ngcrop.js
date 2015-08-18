@@ -1055,26 +1055,63 @@ angular.module('ngcrop').directive('cropImage',
               EXIF.getData(image, function(){
 
                 var orientation = EXIF.getTag(image, 'Orientation');
+                console.log('orientation is ' + orientation);
 
-                if(orientation === 6){
+                if(orientation === 6 || orientation === 8 || orientation === 3){
 
+                  //must scale down the image as images over 2048 px will not draw on HTML5 canvas
                   var scale = Math.min ((2000 / image.width),(2000/ image.height), 1);
                   var tempCanvas = document.createElement('canvas');
                   var tempContext = tempCanvas.getContext('2d');
-                  var height = orientation == 6 ? image.width * scale : image.height * scale;
-                  var width = orientation == 6 ? image.height * scale : image.width * scale;
+                  var height = (orientation == 6 || orientation == 8) ? image.width * scale : image.height * scale;
+                  var width = (orientation == 6 || orientation == 8) ? image.height * scale : image.width * scale;
                   tempCanvas.height = height;
                   tempCanvas.width = width;
+                  var x = 0;
+                  var y = 0;
 
-                  // 90° rotate right
-                  tempContext.translate(width/2,height/2);
-                  tempContext.rotate(0.5 * Math.PI);
-                  //draw the image to the canvas
-                  var x = -(height/2);
-                  var y = -(width/2);
+                  switch(orientation){
+
+                    case 3: {
+
+                      // 180 degrees rotate
+                      tempContext.translate(width/2,height/2);
+                      tempContext.rotate(Math.PI);
+                      //draw the image to the canvas
+                      x = -(height/2);
+                      y = -(width/2);
+                      break;
+
+                    }
+                    case 6: {
+
+                      // 90° rotate right
+                      tempContext.translate(width/2,height/2);
+                      tempContext.rotate(0.5 * Math.PI);
+                      //draw the image to the canvas
+                      x = -(height/2);
+                      y = -(width/2);
+                      break;
+
+                    }
+                    case 8: {
+
+                      // 90° rotate left
+                      tempContext.translate(width/2,height/2);
+                      tempContext.rotate(-0.5 * Math.PI);
+                      //draw the image to the canvas
+                      x = -(height/2);
+                      y = -(width/2);
+                      break;
+
+                    }
+
+                  }
+
+
                   //draw the image
                   tempContext.drawImage(image,x,y,height,width);
-                  //grab the image data and save as a newImage to pass to processNewImage
+0                  //grab the image data and save as a newImage to pass to processNewImage
                   var source = tempCanvas.toDataURL();
                   var newImage = new Image();
                   newImage.onload = function(){
