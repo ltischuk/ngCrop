@@ -191,7 +191,7 @@ angular.module('ngcrop').directive('cropImage',
 
                   //draw the image
                   tempContext.drawImage(image,x,y,height,width);
-0                  //grab the image data and save as a newImage to pass to processNewImage
+                 //grab the image data and save as a newImage to pass to processNewImage
                   var source = tempCanvas.toDataURL();
                   var newImage = new Image();
                   newImage.onload = function(){
