@@ -197,6 +197,7 @@ angular.module('ngcrop').directive('cropImage',
                   newImage.onload = function(){
 
                     cropCanvas.processNewImage(this, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
+                    this.src='about:blank';
 
                   }
 
