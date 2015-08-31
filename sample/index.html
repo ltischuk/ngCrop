@@ -6,6 +6,9 @@
     .hideme {
       visibility: hidden;
     }
+    .margin10 {
+      margin-top:10px;
+    }
 
   </style>
   <title title>NgCrop Example</title>
@@ -35,10 +38,9 @@
                 var img = new Image();
                 img.onload = function () {
 
-                  var newImg = this;
                   $scope.$apply(
                     function() {
-                      $scope.origImageFile = newImg;
+                      $scope.origImageFile = img;
                       $scope.isReadyForCrop = true;
                       $scope.cropViewActivated = true;
                     });
@@ -163,6 +165,16 @@
                 class="btn btn-deep-red btn-block"
                 data-ng-click="revertCrop()">
           Revert
+        </button>
+      </div>
+      <div class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5 margin10">
+        <input type="file" id="reupload" data-ng-show="false" accept="image/jpeg, image/JPG, image/JPEG, image/jpeg" filereader
+               on-file-upload="updateImageView(file)" capture="camera" image-file="image" />
+        <button
+                on-tap
+                class="btn btn-block"
+                data-ng-click="handleFileButtonClick('reupload')">
+          Reupload a file
         </button>
       </div>
     </div>

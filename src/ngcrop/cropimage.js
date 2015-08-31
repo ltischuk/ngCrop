@@ -140,7 +140,7 @@ angular.module('ngcrop').directive('cropImage',
                 if(orientation === 6 || orientation === 8 || orientation === 3){
 
                   //must scale down the image as images over 2048 px will not draw on HTML5 canvas
-                  var scale = Math.min ((2000 / image.width),(2000/ image.height), 1);
+                  var scale = 1;// Math.min ((2000 / image.width),(2000/ image.height), 1);
                   var tempCanvas = document.createElement('canvas');
                   var tempContext = tempCanvas.getContext('2d');
                   var height = (orientation == 6 || orientation == 8) ? image.width * scale : image.height * scale;
