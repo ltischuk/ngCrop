@@ -22,7 +22,7 @@ angular
 angular.module('ngcrop')
     .factory('CropCanvas',
     function CropCanvasFactory
-        (CropSelection,
+        (//CropSelection,
          ResultCanvas)
     {
 
@@ -42,7 +42,7 @@ angular.module('ngcrop')
         this.context = canvasElement[0].getContext('2d');
         this.resultCanvas = angular.isDefined(outputImageFormat) ? new ResultCanvas(outputImageFormat): new ResultCanvas('image/png');
         this.maxLength = maxLength;
-        this.cropSelector = new CropSelection(maxLength);
+       // this.cropSelector = new CropSelection(maxLength);
         this.selectorLineWidth = selectorLineWidth;
         this.selectorColor = selectorColor;
         this.imgScale = 1;
@@ -110,16 +110,16 @@ angular.module('ngcrop')
           this._maxLength = maxLength;
 
         },
-        get cropSelector() {
-
-          return this._cropSelector;
-
-        },
-        set cropSelector(cropSelector){
-
-          this._cropSelector = cropSelector;
-
-        },
+        //get cropSelector() {
+        //
+        //  return this._cropSelector;
+        //
+        //},
+        //set cropSelector(cropSelector){
+        //
+        //  this._cropSelector = cropSelector;
+        //
+        //},
         get selectorLineWidth() {
 
           return this._selectorLineWidth;
@@ -333,24 +333,24 @@ angular.module('ngcrop')
           this.lastX = this.currentX;
           this.lastY = this.currentY;
           this.isSelecting = true;
-          this.cropSelector.setCurrentCorner(this.currentX, this.currentY);
+          //this.cropSelector.setCurrentCorner(this.currentX, this.currentY);
 
-          //if in move zone which will move selector horizontally or vertically
-          //change cursor and set moveCorner to false
-          if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
-
-            this.canvas[0].style.cursor = 'move';
-            this.moveCorner = false;
-
-          }
-          else{
-
-            // we are in corner zone - find nearest corner and set moveCorner to true
-            this.canvas[0].style.cursor = 'crosshair';
-            this.corner = this.cropSelector.nearestCorner(this.currentX, this.currentY);
-            this.moveCorner = true;
-
-          }
+          ////if in move zone which will move selector horizontally or vertically
+          ////change cursor and set moveCorner to false
+          //if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
+          //
+          //  this.canvas[0].style.cursor = 'move';
+          //  this.moveCorner = false;
+          //
+          //}
+          //else{
+          //
+          //  // we are in corner zone - find nearest corner and set moveCorner to true
+          //  this.canvas[0].style.cursor = 'crosshair';
+          //  this.corner = this.cropSelector.nearestCorner(this.currentX, this.currentY);
+          //  this.moveCorner = true;
+          //
+          //}
 
         },
         /**
@@ -371,15 +371,15 @@ angular.module('ngcrop')
           //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
 
-            if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
-              this.canvas[0].style.cursor = 'move';
-            }
-            else{
-
-              this.canvas[0].style.cursor = 'crosshair';
-              this.moveCorner = true;
-
-            }
+            //if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
+            //  this.canvas[0].style.cursor = 'move';
+            //}
+            //else{
+            //
+            //  this.canvas[0].style.cursor = 'crosshair';
+            //  this.moveCorner = true;
+            //
+            //}
 
           }else{
 
@@ -389,7 +389,7 @@ angular.module('ngcrop')
             var xdiff = this.currentX - this.lastX;
             var ydiff = this.currentY - this.lastY;
 
-            this.cropSelector.move(xdiff, ydiff, this.moveCorner, this.corner);
+          //  this.cropSelector.move(xdiff, ydiff, this.moveCorner, this.corner);
             this.lastX = this.currentX;
             this.lastY = this.currentY;
             this._drawCanvas();
@@ -406,7 +406,7 @@ angular.module('ngcrop')
           //turn selector guide variables off and output cropped image data from current selector location
           this.isSelecting = false;
           this.moveCorner = false;
-          this.cropSelector.resetCorner();
+       //   this.cropSelector.resetCorner();
           this._drawCanvas();
           this.canvas[0].style.cursor = 'default';
           this.getCroppedImageData();
@@ -427,35 +427,35 @@ angular.module('ngcrop')
           var y = 0;
           var drawWidth = canvasWidth;
           var drawHeight = canvasHeight;
-          var selectorMiddleX = this.cropSelector.x + (this.cropSelector.length/2);
-          var selectorMiddleY = this.cropSelector.y + (this.cropSelector.length/2);
-          var arrowLength = this.cropSelector.length / 4;
+          //var selectorMiddleX = this.cropSelector.x + (this.cropSelector.length/2);
+          //var selectorMiddleY = this.cropSelector.y + (this.cropSelector.length/2);
+          //var arrowLength = this.cropSelector.length / 4;
 
           this.context.drawImage(this.currentImg,x,y,drawWidth,drawHeight);
 
-          //then draw the rectangle
-          this.context.lineWidth = this.selectorLineWidth;
-          this.context.strokeStyle = this.selectorColor;
-          this.context.strokeRect(this.cropSelector.x,this.cropSelector.y,this.cropSelector.length,this.cropSelector.length);
-
-          this.context.beginPath();
-          this.context.lineWidth = 1;
-          this.context.moveTo(selectorMiddleX -4, selectorMiddleY);
-          this.context.lineTo(selectorMiddleX + 4, selectorMiddleY);
-          this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
-          this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
-          this.context.stroke();
-
-          //draw an error in the bottom lefthand corner
-          this.context.beginPath();
-          this.context.lineWidth = 2;
-          this.context.moveTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
-          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/2)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
-          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/2)));
-          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
-          this.context.closePath();
-          this.context.fillStyle = this.selectorColor;
-          this.context.fill();
+          ////then draw the rectangle
+          //this.context.lineWidth = this.selectorLineWidth;
+          //this.context.strokeStyle = this.selectorColor;
+          //this.context.strokeRect(this.cropSelector.x,this.cropSelector.y,this.cropSelector.length,this.cropSelector.length);
+          //
+          //this.context.beginPath();
+          //this.context.lineWidth = 1;
+          //this.context.moveTo(selectorMiddleX -4, selectorMiddleY);
+          //this.context.lineTo(selectorMiddleX + 4, selectorMiddleY);
+          //this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
+          //this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
+          //this.context.stroke();
+          //
+          ////draw an error in the bottom lefthand corner
+          //this.context.beginPath();
+          //this.context.lineWidth = 2;
+          //this.context.moveTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          //this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/2)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          //this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/2)));
+          //this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          //this.context.closePath();
+          //this.context.fillStyle = this.selectorColor;
+          //this.context.fill();
 
 
         },
@@ -465,10 +465,10 @@ angular.module('ngcrop')
          */
         getCroppedImageData: function(){
 
-          var x = this.cropSelector.x/this.imgScale;
-          var y = this.cropSelector.y/this.imgScale;
-          var len = this.cropSelector.length/this.imgScale;
-          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len, this.currentImgOrientation);
+          //var x = this.cropSelector.x/this.imgScale;
+          //var y = this.cropSelector.y/this.imgScale;
+          //var len = this.cropSelector.length/this.imgScale;
+          var data = this.resultCanvas.getDataUrl(this.currentImg, 0, 0,this.currentImg.length, this.currentImgOrientation);
 
           //callback draw data
           this.onCropResult(data);
@@ -496,9 +496,9 @@ angular.module('ngcrop')
 
           return {
 
-              x: this.cropSelector.x,
-              y: this.cropSelector.y,
-              length: this.cropSelector.length,
+              x: 0, //this.cropSelector.x,
+              y: 0,// this.cropSelector.y,
+              length:0,// this.cropSelector.length,
               scale: this.imgScale
 
             }
@@ -516,8 +516,8 @@ angular.module('ngcrop')
           this.canvas[0].width = (img.width * this.imgScale);
 
           //initialize cropSelector dimensions
-          this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
-              selectorStartX, selectorStartY, selectorStartLength);
+          //this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
+          //    selectorStartX, selectorStartY, selectorStartLength);
 
           //obtain bounds for the rectangle to assess mouse/touch event points
           var rect = this.canvas[0].getBoundingClientRect();
@@ -545,7 +545,6 @@ angular.module('ngcrop')
           this.canvas.off('touchmove',this._handleMove);
           this.canvas.off('touchleave',this._handleUp);
           this.canvas.off('touchend',this._handleUp);
-          this.canvas.remove();
 
         }
 
@@ -555,364 +554,364 @@ angular.module('ngcrop')
 
     }
 );
-/**
- * Created by ltischuk on 2/7/15.
- */
-angular.module('ngcrop')
-  .factory('CropSelection', function CropSelectionFactory(ngCropConstants) {
-
-    /**
-     * CropSelection
-     * A class to support the movement of a square selector on top of a canvas
-      * @param maxLength
-     * @constructor
-     */
-    function CropSelection(){
-
-      this.x = 0;
-      this.y = 0;
-      this.length = 0;
-      this.outerCushion = 2;
-      this.maxX = 0;
-      this.maxY = 0;
-      this.currentCorner = 0;
-
-    }
-
-      /**
-       * Prototype functions
-       **/
-    CropSelection.prototype = {
-
-      //accessor methods
-      get x(){
-
-        return this._x;
-
-      },
-      set x(x){
-
-        this._x = x;
-
-      },
-      get y(){
-
-        return this._y;
-
-      },
-      set y(y){
-
-        this._y = y;
-
-      },
-      get length(){
-
-        return this._length;
-
-      },
-      set length(length){
-
-        this._length = length;
-
-      },
-      get outerCushion(){
-
-        return this._outerCushion;
-
-      },
-      set outerCushion(outerCushion){
-
-        this._outerCushion = outerCushion;
-
-      },
-      get maxX(){
-
-        return this._maxX;
-
-      },
-      set maxX(maxX){
-
-        this._maxX = maxX;
-
-      },
-      get maxY(){
-
-        return this._maxY;
-
-      },
-      set maxY(maxY){
-
-        this._maxY = maxY;
-
-      },
-      get currentCorner(){
-
-        return this._currentCorner;
-
-      },
-      set currentCorner(currentCorner){
-
-        this._currentCorner = currentCorner;
-
-      },
-      /**
-       * Set the selector dimensions given a new canvas (parent) width and height
-       * @param parentWidth
-       * @param parentHeight
-       * @param (optional) startX - starting value of X within the canvas dimensions
-       * @param (optional) startY - starting value of Y within the canvas dimensions
-       * @param (optional) startLength - starting value of length within the canvas dimensions
-       *
-       */
-      initSelectorDimensions : function(parentWidth, parentHeight, startX, startY, startLength){
-
-        this.maxX = parentWidth - this.outerCushion;
-        this.maxY = parentHeight - this.outerCushion;
-
-        startX = Number(startX);
-        startY = Number(startY);
-        startLength = Number(startLength);
-
-        if(angular.isDefined(startX) && angular.isDefined(startY) && angular.isDefined(startLength) &&
-        isFinite(startX), isFinite(startY), isFinite(startLength) && startLength > 0){
-
-          this.x = startX;
-          this.y = startY;
-          this.length = startLength;
-
-        }else{
-
-          //position selector in the center of the parent canvas
-          var minLenValue = Math.min(parentWidth, parentHeight);
-          this.x = (this.maxX / 2) - (minLenValue/4);
-          this.y = (minLenValue/4);
-          this.length = minLenValue/2;
-
-        }
-
-      },
-      /**
-       * Calculate whether or not the point is in the center move zone to move the entire selector in any direction
-       * @param pointX
-       * @param pointY
-       * @returns {boolean}
-       */
-      isInMoveZone : function(pointX, pointY){
-
-        //find if point is in moveable territory and not in expandable/collapsable areas near corners
-        var moveZoneMinBound = this.length / 12;
-        var moveZoneMaxBound = this.length - moveZoneMinBound;
-        if(pointX >= (this.x + moveZoneMinBound) && pointX <= (this.x + moveZoneMaxBound) &&
-          pointY >= (this.y + moveZoneMinBound) && pointY <= (this.y + moveZoneMaxBound)){
-
-          return true;
-        }
-        return false;
-      },
-      /**
-       * isValidCornerMove - checks if the move is valid given an increment for x and y and length increment
-       * @param increment for x and y
-       * @param lenIncrement for the length
-       * @returns {boolean}
-       * @private
-       */
-      _isValidCornerMove : function( increment,lenIncrement){
-
-        var newX = increment + this.x;
-        var newY = increment + this.y;
-        var newLen = this.length + lenIncrement;
-        return (newX >= this.outerCushion && (newX + newLen) < this.maxX &&
-                newY >= this.outerCushion && (newY + newLen) < this.maxY &&
-                newLen > 10);
-
-      },
-      /**
-       * Determines whether a given potential increment is allowed for length
-       * @param acc
-       * @returns {boolean}
-       * @private
-       */
-      _isValidLengthMove: function(acc){
-
-        var tempLength = (this.length + acc);
-        if(this.x + tempLength > this.maxX || this.y + tempLength > this.maxY
-            || tempLength < 10){
-          return false;
-
-        }
-        return true;
-
-      },
-      /**
-       * Determine whether a given potential increment can be applied to X
-       * @param acc
-       * @returns {boolean}
-       * @private
-       */
-      _isValidXMove : function(acc){
-
-        var tempX = acc + this.x;
-        if(tempX < this.outerCushion || tempX + this.length > this.maxX){
-          return false;
-        }
-        return true;
-
-      },
-      /**
-       * Determine whether a given potential increment can be applied to Y
-       * @param acc
-       * @returns {boolean}
-       * @private
-       */
-      _isValidYMove : function(acc){
-
-        var tempY = acc + this.y;
-        if(tempY < this.outerCushion || tempY + this.length > this.maxY){
-          return false;
-        }
-        return true;
-      },
-      /**
-       * Move the selector x, y coordinates given a move increment and compute new length if necessary
-       * @param xMove
-       * @param yMove
-       * @param isCorner
-       * @param cornerPosition
-       */
-      move : function(xMove,yMove, isCorner, cornerPosition){
-
-        if(isCorner){
-
-          // assess the direction of the current move, then normalize the adjustments so we maintain
-          // smoothness in movement
-          var movingUp = yMove < 0 ? true: false;
-          var movingLeft = xMove < 0 ? true : false;
-          var movingDown = yMove > 0 ? true : false;
-          var moveAdj = Math.max(Math.abs(xMove),Math.abs(yMove));
-          var lenAdj = moveAdj * 2;
-
-          //if the corner passed in is the same as the currentCorner from the mousedown event,
-          // calculate the move and length adjustment to expand and/or collapse square
-          if(this.currentCorner == cornerPosition){
-
-            switch(cornerPosition) {
-
-              case ngCropConstants.POSITIONS.TOP_LEFT:
-              {
-
-                lenAdj *= movingLeft || movingUp ? 1 : -1;
-                moveAdj *= movingLeft || movingUp ? -1 : 1;
-                break;
-
-              }
-              case ngCropConstants.POSITIONS.TOP_RIGHT:
-              {
-
-                lenAdj *=  movingDown || movingLeft ? -1 : 1;
-                moveAdj *=  movingDown || movingLeft ? 1 : -1;
-                break;
-
-              }
-              case ngCropConstants.POSITIONS.BOTTOM_LEFT:
-              {
-
-                lenAdj *=  movingDown || movingLeft ? 1 : -1;
-                moveAdj *=  movingDown || movingLeft ? -1 : 1;
-                break;
-              }
-              default:
-              {
-
-                lenAdj *= movingLeft || movingUp ? -1 : 1;
-                moveAdj *= movingLeft || movingUp ? 1 : -1;
-                break;
-
-              }
-            }
-
-            //if its a valid move, then adjust x,y and length
-            if(this._isValidCornerMove(moveAdj,lenAdj)){
-              this.x += moveAdj;
-              this.y += moveAdj;
-              this.length += lenAdj;
-            }
-          }
-
-        }else{
-          //otherwise move entire selector square as it is not a corner move
-          this.x = this._isValidXMove(xMove) ? this.x + xMove : this.x;
-          this.y = this._isValidYMove(yMove) ? this.y + yMove : this.y;
-        }
-
-      },
-      /**
-       * Find nearest corner given a point on the canvas
-       * @param pointX
-       * @param pointY
-       * @private
-       * @returns {number}
-       */
-      nearestCorner: function(pointX, pointY){
-
-        //assess the number of pixels from the given points
-        var pxFromXLeft = Math.abs(pointX - this.x);
-        var pxFromXRight = Math.abs(pointX - (this.x + this.length));
-        var pxFromYTop = Math.abs(pointY - this.y);
-        var pxFromYBottom = Math.abs(pointY - (this.y + this.length));
-
-        //calibrate the corners given the pixels from the points
-        var topLeft = pxFromXLeft + pxFromYTop;
-        var topRight = pxFromXRight + pxFromYTop;
-        var bottomLeft = pxFromXLeft + pxFromYBottom;
-        var bottomRight = pxFromXRight + pxFromYBottom;
-
-        //figure out the nearest corner given the smallest value from the calibrated corners
-        var chosen = Math.min(topLeft, topRight, bottomLeft, bottomRight);
-
-        var corner = 0;
-
-        if(chosen == topLeft){
-
-          corner = 1;
-
-        } else if(chosen == topRight){
-
-          corner = 2;
-
-        }else if(chosen == bottomLeft){
-
-          corner = 3;
-
-        }else{
-
-          corner = 4;
-
-        }
-        return corner;
-
-      },
-      /**
-       * Lock the current corner given an X and Y point
-       * @param mouseX
-       * @param mouseY
-       */
-      setCurrentCorner: function(mouseX, mouseY){
-
-        this.currentCorner = this.nearestCorner(mouseX, mouseY);
-
-      },
-      resetCorner: function(){
-
-        this.currentCorner = 0;
-
-      }
-
-
-    }
-
-    return CropSelection;
-  }
-);
+///**
+// * Created by ltischuk on 2/7/15.
+// */
+//angular.module('ngcrop')
+//  .factory('CropSelection', function CropSelectionFactory(ngCropConstants) {
+//
+//    /**
+//     * CropSelection
+//     * A class to support the movement of a square selector on top of a canvas
+//      * @param maxLength
+//     * @constructor
+//     */
+//    function CropSelection(){
+//
+//      this.x = 0;
+//      this.y = 0;
+//      this.length = 0;
+//      this.outerCushion = 2;
+//      this.maxX = 0;
+//      this.maxY = 0;
+//      this.currentCorner = 0;
+//
+//    }
+//
+//      /**
+//       * Prototype functions
+//       **/
+//    CropSelection.prototype = {
+//
+//      //accessor methods
+//      get x(){
+//
+//        return this._x;
+//
+//      },
+//      set x(x){
+//
+//        this._x = x;
+//
+//      },
+//      get y(){
+//
+//        return this._y;
+//
+//      },
+//      set y(y){
+//
+//        this._y = y;
+//
+//      },
+//      get length(){
+//
+//        return this._length;
+//
+//      },
+//      set length(length){
+//
+//        this._length = length;
+//
+//      },
+//      get outerCushion(){
+//
+//        return this._outerCushion;
+//
+//      },
+//      set outerCushion(outerCushion){
+//
+//        this._outerCushion = outerCushion;
+//
+//      },
+//      get maxX(){
+//
+//        return this._maxX;
+//
+//      },
+//      set maxX(maxX){
+//
+//        this._maxX = maxX;
+//
+//      },
+//      get maxY(){
+//
+//        return this._maxY;
+//
+//      },
+//      set maxY(maxY){
+//
+//        this._maxY = maxY;
+//
+//      },
+//      get currentCorner(){
+//
+//        return this._currentCorner;
+//
+//      },
+//      set currentCorner(currentCorner){
+//
+//        this._currentCorner = currentCorner;
+//
+//      },
+//      /**
+//       * Set the selector dimensions given a new canvas (parent) width and height
+//       * @param parentWidth
+//       * @param parentHeight
+//       * @param (optional) startX - starting value of X within the canvas dimensions
+//       * @param (optional) startY - starting value of Y within the canvas dimensions
+//       * @param (optional) startLength - starting value of length within the canvas dimensions
+//       *
+//       */
+//      initSelectorDimensions : function(parentWidth, parentHeight, startX, startY, startLength){
+//
+//        this.maxX = parentWidth - this.outerCushion;
+//        this.maxY = parentHeight - this.outerCushion;
+//
+//        startX = Number(startX);
+//        startY = Number(startY);
+//        startLength = Number(startLength);
+//
+//        if(angular.isDefined(startX) && angular.isDefined(startY) && angular.isDefined(startLength) &&
+//        isFinite(startX), isFinite(startY), isFinite(startLength) && startLength > 0){
+//
+//          this.x = startX;
+//          this.y = startY;
+//          this.length = startLength;
+//
+//        }else{
+//
+//          //position selector in the center of the parent canvas
+//          var minLenValue = Math.min(parentWidth, parentHeight);
+//          this.x = (this.maxX / 2) - (minLenValue/4);
+//          this.y = (minLenValue/4);
+//          this.length = minLenValue/2;
+//
+//        }
+//
+//      },
+//      /**
+//       * Calculate whether or not the point is in the center move zone to move the entire selector in any direction
+//       * @param pointX
+//       * @param pointY
+//       * @returns {boolean}
+//       */
+//      isInMoveZone : function(pointX, pointY){
+//
+//        //find if point is in moveable territory and not in expandable/collapsable areas near corners
+//        var moveZoneMinBound = this.length / 12;
+//        var moveZoneMaxBound = this.length - moveZoneMinBound;
+//        if(pointX >= (this.x + moveZoneMinBound) && pointX <= (this.x + moveZoneMaxBound) &&
+//          pointY >= (this.y + moveZoneMinBound) && pointY <= (this.y + moveZoneMaxBound)){
+//
+//          return true;
+//        }
+//        return false;
+//      },
+//      /**
+//       * isValidCornerMove - checks if the move is valid given an increment for x and y and length increment
+//       * @param increment for x and y
+//       * @param lenIncrement for the length
+//       * @returns {boolean}
+//       * @private
+//       */
+//      _isValidCornerMove : function( increment,lenIncrement){
+//
+//        var newX = increment + this.x;
+//        var newY = increment + this.y;
+//        var newLen = this.length + lenIncrement;
+//        return (newX >= this.outerCushion && (newX + newLen) < this.maxX &&
+//                newY >= this.outerCushion && (newY + newLen) < this.maxY &&
+//                newLen > 10);
+//
+//      },
+//      /**
+//       * Determines whether a given potential increment is allowed for length
+//       * @param acc
+//       * @returns {boolean}
+//       * @private
+//       */
+//      _isValidLengthMove: function(acc){
+//
+//        var tempLength = (this.length + acc);
+//        if(this.x + tempLength > this.maxX || this.y + tempLength > this.maxY
+//            || tempLength < 10){
+//          return false;
+//
+//        }
+//        return true;
+//
+//      },
+//      /**
+//       * Determine whether a given potential increment can be applied to X
+//       * @param acc
+//       * @returns {boolean}
+//       * @private
+//       */
+//      _isValidXMove : function(acc){
+//
+//        var tempX = acc + this.x;
+//        if(tempX < this.outerCushion || tempX + this.length > this.maxX){
+//          return false;
+//        }
+//        return true;
+//
+//      },
+//      /**
+//       * Determine whether a given potential increment can be applied to Y
+//       * @param acc
+//       * @returns {boolean}
+//       * @private
+//       */
+//      _isValidYMove : function(acc){
+//
+//        var tempY = acc + this.y;
+//        if(tempY < this.outerCushion || tempY + this.length > this.maxY){
+//          return false;
+//        }
+//        return true;
+//      },
+//      /**
+//       * Move the selector x, y coordinates given a move increment and compute new length if necessary
+//       * @param xMove
+//       * @param yMove
+//       * @param isCorner
+//       * @param cornerPosition
+//       */
+//      move : function(xMove,yMove, isCorner, cornerPosition){
+//
+//        if(isCorner){
+//
+//          // assess the direction of the current move, then normalize the adjustments so we maintain
+//          // smoothness in movement
+//          var movingUp = yMove < 0 ? true: false;
+//          var movingLeft = xMove < 0 ? true : false;
+//          var movingDown = yMove > 0 ? true : false;
+//          var moveAdj = Math.max(Math.abs(xMove),Math.abs(yMove));
+//          var lenAdj = moveAdj * 2;
+//
+//          //if the corner passed in is the same as the currentCorner from the mousedown event,
+//          // calculate the move and length adjustment to expand and/or collapse square
+//          if(this.currentCorner == cornerPosition){
+//
+//            switch(cornerPosition) {
+//
+//              case ngCropConstants.POSITIONS.TOP_LEFT:
+//              {
+//
+//                lenAdj *= movingLeft || movingUp ? 1 : -1;
+//                moveAdj *= movingLeft || movingUp ? -1 : 1;
+//                break;
+//
+//              }
+//              case ngCropConstants.POSITIONS.TOP_RIGHT:
+//              {
+//
+//                lenAdj *=  movingDown || movingLeft ? -1 : 1;
+//                moveAdj *=  movingDown || movingLeft ? 1 : -1;
+//                break;
+//
+//              }
+//              case ngCropConstants.POSITIONS.BOTTOM_LEFT:
+//              {
+//
+//                lenAdj *=  movingDown || movingLeft ? 1 : -1;
+//                moveAdj *=  movingDown || movingLeft ? -1 : 1;
+//                break;
+//              }
+//              default:
+//              {
+//
+//                lenAdj *= movingLeft || movingUp ? -1 : 1;
+//                moveAdj *= movingLeft || movingUp ? 1 : -1;
+//                break;
+//
+//              }
+//            }
+//
+//            //if its a valid move, then adjust x,y and length
+//            if(this._isValidCornerMove(moveAdj,lenAdj)){
+//              this.x += moveAdj;
+//              this.y += moveAdj;
+//              this.length += lenAdj;
+//            }
+//          }
+//
+//        }else{
+//          //otherwise move entire selector square as it is not a corner move
+//          this.x = this._isValidXMove(xMove) ? this.x + xMove : this.x;
+//          this.y = this._isValidYMove(yMove) ? this.y + yMove : this.y;
+//        }
+//
+//      },
+//      /**
+//       * Find nearest corner given a point on the canvas
+//       * @param pointX
+//       * @param pointY
+//       * @private
+//       * @returns {number}
+//       */
+//      nearestCorner: function(pointX, pointY){
+//
+//        //assess the number of pixels from the given points
+//        var pxFromXLeft = Math.abs(pointX - this.x);
+//        var pxFromXRight = Math.abs(pointX - (this.x + this.length));
+//        var pxFromYTop = Math.abs(pointY - this.y);
+//        var pxFromYBottom = Math.abs(pointY - (this.y + this.length));
+//
+//        //calibrate the corners given the pixels from the points
+//        var topLeft = pxFromXLeft + pxFromYTop;
+//        var topRight = pxFromXRight + pxFromYTop;
+//        var bottomLeft = pxFromXLeft + pxFromYBottom;
+//        var bottomRight = pxFromXRight + pxFromYBottom;
+//
+//        //figure out the nearest corner given the smallest value from the calibrated corners
+//        var chosen = Math.min(topLeft, topRight, bottomLeft, bottomRight);
+//
+//        var corner = 0;
+//
+//        if(chosen == topLeft){
+//
+//          corner = 1;
+//
+//        } else if(chosen == topRight){
+//
+//          corner = 2;
+//
+//        }else if(chosen == bottomLeft){
+//
+//          corner = 3;
+//
+//        }else{
+//
+//          corner = 4;
+//
+//        }
+//        return corner;
+//
+//      },
+//      /**
+//       * Lock the current corner given an X and Y point
+//       * @param mouseX
+//       * @param mouseY
+//       */
+//      setCurrentCorner: function(mouseX, mouseY){
+//
+//        this.currentCorner = this.nearestCorner(mouseX, mouseY);
+//
+//      },
+//      resetCorner: function(){
+//
+//        this.currentCorner = 0;
+//
+//      }
+//
+//
+//    }
+//
+//    return CropSelection;
+//  }
+//);
 
 /**
  * Created by ltischuk on 12/29/14.
@@ -944,7 +943,7 @@ angular.module('ngcrop').directive('cropImage',
           restrict: 'E',
           scope: {
 
-            origImageData: '=',
+            accessor: '=',
             croppedImgData: '=',
             maxImgDisplayLength: '=?',
             croppedImgFormat: '@?',
@@ -961,6 +960,22 @@ angular.module('ngcrop').directive('cropImage',
           },
           template: '<canvas></canvas>',
           link: function (scope, element, attrs) {
+
+            if(scope.accessor){
+              scope.accessor.processNewDataUrl = function(newImageUrl){
+                if(angular.isDefined(newImageUrl)){
+
+                  if(angular.isDefined(attrs.startCanvasImgProcessCallback) && angular.isFunction(scope.startCanvasImgProcessCallback)){
+                    //call function in parent if required for starting to process image
+                    scope.startCanvasImgProcessCallback();
+
+                  }
+
+                  loadImage(newImageUrl);
+                }
+              }
+              //);
+            }
 
             // variables assess and set accordingly
             scope.selectorColor = angular.isDefined(attrs.selectorColor) ? scope.selectorColor : '#ff0000';
@@ -988,25 +1003,13 @@ angular.module('ngcrop').directive('cropImage',
             var cropCanvas = new CropCanvas(cvs,maxCanvasLength, scope.selectorLineWidth, scope.selectorColor, scope.croppedImgFormat, onCropResult);
 
             //watch for changes on the main original image in the controller that contains the image (uploads of new images, etc.)
-            scope.$watch(function(scope) { return scope.origImageData },
-              function(newImage) {
+            //scope.$watch(function(scope) { return scope.origImageData },
+            //  function(newImageUrl) {
 
-                if(angular.isDefined(newImage)){
 
-                  if(angular.isDefined(attrs.startCanvasImgProcessCallback) && angular.isFunction(scope.startCanvasImgProcessCallback)){
-                    //call function in parent if required for starting to process image
-                    scope.startCanvasImgProcessCallback();
+            function loadImage(dataURL){
 
-                  }
-
-                  loadImage();
-                }
-              }
-            );
-
-            function loadImage(){
-
-              currentImg = new Image();
+              currentImg  = new Image();
 
               currentImg.onload = function(){
 
@@ -1014,7 +1017,7 @@ angular.module('ngcrop').directive('cropImage',
 
               }
 
-              currentImg.src = scope.origImageData;
+              currentImg.src = dataURL;
 
             }
 
@@ -1066,82 +1069,91 @@ angular.module('ngcrop').directive('cropImage',
             function properlyOrientImage(image){
 
 
-              //get the EXIF data from the image and if orientation is 6, then rotate the image
-              EXIF.getData(image, function(){
-
-                var orientation = EXIF.getTag(image, 'Orientation');
-
-                if(orientation === 6 || orientation === 8 || orientation === 3){
-
-                  //must scale down the image as images over 2048 px will not draw on HTML5 canvas
-                  var scale = 1;// Math.min ((2000 / image.width),(2000/ image.height), 1);
-                  var tempCanvas = document.createElement('canvas');
-                  var tempContext = tempCanvas.getContext('2d');
-                  var height = (orientation == 6 || orientation == 8) ? image.width * scale : image.height * scale;
-                  var width = (orientation == 6 || orientation == 8) ? image.height * scale : image.width * scale;
-                  tempCanvas.height = height;
-                  tempCanvas.width = width;
-                  var x = 0;
-                  var y = 0;
-
-                  switch(orientation){
-
-                    case 3: {
-
-                      // 180 degrees rotate
-                      tempContext.translate(width/2,height/2);
-                      tempContext.rotate(Math.PI);
-                      //draw the image to the canvas
-                      x = -(height/2);
-                      y = -(width/2);
-                      break;
-
-                    }
-                    case 6: {
-
-                      // 90° rotate right
-                      tempContext.translate(width/2,height/2);
-                      tempContext.rotate(0.5 * Math.PI);
-                      //draw the image to the canvas
-                      x = -(height/2);
-                      y = -(width/2);
-                      break;
-
-                    }
-                    case 8: {
-
-                      // 90° rotate left
-                      tempContext.translate(width/2,height/2);
-                      tempContext.rotate(-0.5 * Math.PI);
-                      //draw the image to the canvas
-                      x = -(height/2);
-                      y = -(width/2);
-                      break;
-
-                    }
-
-                  }
-
-
-                  //draw the image
-                  tempContext.drawImage(image,x,y,height,width);
-                 //grab the image data and save as a newImage to pass to processNewImage
-                  var source = tempCanvas.toDataURL();
-                  var newImage = new Image();
-                  newImage.onload = function(){
-
-                    cropCanvas.processNewImage(this, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
-
-                  }
-
-                  newImage.src = source;
-
-                }else{
+              ////get the EXIF data from the image and if orientation is 6, then rotate the image
+              //console.log('about to get EXIF data' + new Date().getTime());
+              //EXIF.getData(image, function(){
+              //
+              //  console.log('received EXIF data' + new Date().getTime());
+              //  var orientation = EXIF.getTag(image, 'Orientation');
+              //
+              //  console.log('got EXIF tag' + new Date().getTime());
+              //  if(orientation === 6 || orientation === 8 || orientation === 3){
+              //
+              //    //must scale down the image as images over 2048 px will not draw on HTML5 canvas
+              //    var scale = 1;// Math.min ((2000 / image.width),(2000/ image.height), 1);
+              //    var tempCanvas = document.createElement('canvas');
+              //    var tempContext = tempCanvas.getContext('2d');
+              //    tempContext.save();
+              //    var height = (orientation == 6 || orientation == 8) ? image.width * scale : image.height * scale;
+              //    var width = (orientation == 6 || orientation == 8) ? image.height * scale : image.width * scale;
+              //    tempCanvas.height = height;
+              //    tempCanvas.width = width;
+              //    var x = 0;
+              //    var y = 0;
+              //
+              //    console.log('Created a new temp canvas' + new Date().getTime());
+              //    switch(orientation){
+              //
+              //      case 3: {
+              //
+              //        // 180 degrees rotate
+              //        tempContext.translate(width/2,height/2);
+              //        tempContext.rotate(Math.PI);
+              //        //draw the image to the canvas
+              //        x = -(height/2);
+              //        y = -(width/2);
+              //        break;
+              //
+              //      }
+              //      case 6: {
+              //
+              //        // 90° rotate right
+              //        tempContext.translate(width/2,height/2);
+              //        tempContext.rotate(0.5 * Math.PI);
+              //        //draw the image to the canvas
+              //        x = -(height/2);
+              //        y = -(width/2);
+              //        break;
+              //
+              //      }
+              //      case 8: {
+              //
+              //        // 90° rotate left
+              //        tempContext.translate(width/2,height/2);
+              //        tempContext.rotate(-0.5 * Math.PI);
+              //        //draw the image to the canvas
+              //        x = -(height/2);
+              //        y = -(width/2);
+              //        break;
+              //
+              //      }
+              //
+              //    }
+              //
+              //
+              //    //draw the image
+              //    console.log('drawing image after rotating canvas' + new Date().getTime());
+              //    tempContext.drawImage(image,x,y,height,width);
+              //    tempContext.restore();
+              //   //grab the image data and save as a newImage to pass to processNewImage
+              //    var newDataUrl = tempCanvas.toDataURL();
+              //    console.log('called toDataURL after drawing' + new Date().getTime());
+              //    tempCanvas = tempContext = null;
+              //    //currentImg.onload = function(){
+              //    //
+              //    //  console.log('loading image after rotating canvas' + new Date().getTime());
+              //    //  cropCanvas.processNewImage(this, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
+              //    //
+              //    //}
+              //
+              //    loadImage(newDataUrl);
+              //
+              //  }else{
 
                   cropCanvas.processNewImage(image, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
-                }
+             //   }
 
-              });
+             // });
 
             }
 
@@ -1154,6 +1166,8 @@ angular.module('ngcrop').directive('cropImage',
               //remove orientationchange event listener and destroy the cropCanvas
               $window.removeEventListener('orientationchange',orientationListener, false);
               cropCanvas.destroy();
+              cvs.remove();
+              currentImg = null;
 
             });
 

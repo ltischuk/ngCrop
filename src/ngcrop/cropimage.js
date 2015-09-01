@@ -28,7 +28,7 @@ angular.module('ngcrop').directive('cropImage',
           restrict: 'E',
           scope: {
 
-            origImageData: '=',
+            accessor: '=',
             croppedImgData: '=',
             maxImgDisplayLength: '=?',
             croppedImgFormat: '@?',
@@ -45,6 +45,22 @@ angular.module('ngcrop').directive('cropImage',
           },
           template: '<canvas></canvas>',
           link: function (scope, element, attrs) {
+
+            if(scope.accessor){
+              scope.accessor.processNewDataUrl = function(newImageUrl){
+                if(angular.isDefined(newImageUrl)){
+
+                  if(angular.isDefined(attrs.startCanvasImgProcessCallback) && angular.isFunction(scope.startCanvasImgProcessCallback)){
+                    //call function in parent if required for starting to process image
+                    scope.startCanvasImgProcessCallback();
+
+                  }
+
+                  loadImage(newImageUrl);
+                }
+              }
+              //);
+            }
 
             // variables assess and set accordingly
             scope.selectorColor = angular.isDefined(attrs.selectorColor) ? scope.selectorColor : '#ff0000';
@@ -72,25 +88,13 @@ angular.module('ngcrop').directive('cropImage',
             var cropCanvas = new CropCanvas(cvs,maxCanvasLength, scope.selectorLineWidth, scope.selectorColor, scope.croppedImgFormat, onCropResult);
 
             //watch for changes on the main original image in the controller that contains the image (uploads of new images, etc.)
-            scope.$watch(function(scope) { return scope.origImageData },
-              function(newImage) {
+            //scope.$watch(function(scope) { return scope.origImageData },
+            //  function(newImageUrl) {
 
-                if(angular.isDefined(newImage)){
 
-                  if(angular.isDefined(attrs.startCanvasImgProcessCallback) && angular.isFunction(scope.startCanvasImgProcessCallback)){
-                    //call function in parent if required for starting to process image
-                    scope.startCanvasImgProcessCallback();
+            function loadImage(dataURL){
 
-                  }
-
-                  loadImage();
-                }
-              }
-            );
-
-            function loadImage(){
-
-              currentImg = new Image();
+              currentImg  = new Image();
 
               currentImg.onload = function(){
 
@@ -98,7 +102,7 @@ angular.module('ngcrop').directive('cropImage',
 
               }
 
-              currentImg.src = scope.origImageData;
+              currentImg.src = dataURL;
 
             }
 
@@ -150,82 +154,91 @@ angular.module('ngcrop').directive('cropImage',
             function properlyOrientImage(image){
 
 
-              //get the EXIF data from the image and if orientation is 6, then rotate the image
-              EXIF.getData(image, function(){
-
-                var orientation = EXIF.getTag(image, 'Orientation');
-
-                if(orientation === 6 || orientation === 8 || orientation === 3){
-
-                  //must scale down the image as images over 2048 px will not draw on HTML5 canvas
-                  var scale = 1;// Math.min ((2000 / image.width),(2000/ image.height), 1);
-                  var tempCanvas = document.createElement('canvas');
-                  var tempContext = tempCanvas.getContext('2d');
-                  var height = (orientation == 6 || orientation == 8) ? image.width * scale : image.height * scale;
-                  var width = (orientation == 6 || orientation == 8) ? image.height * scale : image.width * scale;
-                  tempCanvas.height = height;
-                  tempCanvas.width = width;
-                  var x = 0;
-                  var y = 0;
-
-                  switch(orientation){
-
-                    case 3: {
-
-                      // 180 degrees rotate
-                      tempContext.translate(width/2,height/2);
-                      tempContext.rotate(Math.PI);
-                      //draw the image to the canvas
-                      x = -(height/2);
-                      y = -(width/2);
-                      break;
-
-                    }
-                    case 6: {
-
-                      // 90° rotate right
-                      tempContext.translate(width/2,height/2);
-                      tempContext.rotate(0.5 * Math.PI);
-                      //draw the image to the canvas
-                      x = -(height/2);
-                      y = -(width/2);
-                      break;
-
-                    }
-                    case 8: {
-
-                      // 90° rotate left
-                      tempContext.translate(width/2,height/2);
-                      tempContext.rotate(-0.5 * Math.PI);
-                      //draw the image to the canvas
-                      x = -(height/2);
-                      y = -(width/2);
-                      break;
-
-                    }
-
-                  }
-
-
-                  //draw the image
-                  tempContext.drawImage(image,x,y,height,width);
-                 //grab the image data and save as a newImage to pass to processNewImage
-                  var source = tempCanvas.toDataURL();
-                  var newImage = new Image();
-                  newImage.onload = function(){
-
-                    cropCanvas.processNewImage(this, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
-
-                  }
-
-                  newImage.src = source;
-
-                }else{
+              ////get the EXIF data from the image and if orientation is 6, then rotate the image
+              //console.log('about to get EXIF data' + new Date().getTime());
+              //EXIF.getData(image, function(){
+              //
+              //  console.log('received EXIF data' + new Date().getTime());
+              //  var orientation = EXIF.getTag(image, 'Orientation');
+              //
+              //  console.log('got EXIF tag' + new Date().getTime());
+              //  if(orientation === 6 || orientation === 8 || orientation === 3){
+              //
+              //    //must scale down the image as images over 2048 px will not draw on HTML5 canvas
+              //    var scale = 1;// Math.min ((2000 / image.width),(2000/ image.height), 1);
+              //    var tempCanvas = document.createElement('canvas');
+              //    var tempContext = tempCanvas.getContext('2d');
+              //    tempContext.save();
+              //    var height = (orientation == 6 || orientation == 8) ? image.width * scale : image.height * scale;
+              //    var width = (orientation == 6 || orientation == 8) ? image.height * scale : image.width * scale;
+              //    tempCanvas.height = height;
+              //    tempCanvas.width = width;
+              //    var x = 0;
+              //    var y = 0;
+              //
+              //    console.log('Created a new temp canvas' + new Date().getTime());
+              //    switch(orientation){
+              //
+              //      case 3: {
+              //
+              //        // 180 degrees rotate
+              //        tempContext.translate(width/2,height/2);
+              //        tempContext.rotate(Math.PI);
+              //        //draw the image to the canvas
+              //        x = -(height/2);
+              //        y = -(width/2);
+              //        break;
+              //
+              //      }
+              //      case 6: {
+              //
+              //        // 90° rotate right
+              //        tempContext.translate(width/2,height/2);
+              //        tempContext.rotate(0.5 * Math.PI);
+              //        //draw the image to the canvas
+              //        x = -(height/2);
+              //        y = -(width/2);
+              //        break;
+              //
+              //      }
+              //      case 8: {
+              //
+              //        // 90° rotate left
+              //        tempContext.translate(width/2,height/2);
+              //        tempContext.rotate(-0.5 * Math.PI);
+              //        //draw the image to the canvas
+              //        x = -(height/2);
+              //        y = -(width/2);
+              //        break;
+              //
+              //      }
+              //
+              //    }
+              //
+              //
+              //    //draw the image
+              //    console.log('drawing image after rotating canvas' + new Date().getTime());
+              //    tempContext.drawImage(image,x,y,height,width);
+              //    tempContext.restore();
+              //   //grab the image data and save as a newImage to pass to processNewImage
+              //    var newDataUrl = tempCanvas.toDataURL();
+              //    console.log('called toDataURL after drawing' + new Date().getTime());
+              //    tempCanvas = tempContext = null;
+              //    //currentImg.onload = function(){
+              //    //
+              //    //  console.log('loading image after rotating canvas' + new Date().getTime());
+              //    //  cropCanvas.processNewImage(this, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
+              //    //
+              //    //}
+              //
+              //    loadImage(newDataUrl);
+              //
+              //  }else{
 
                   cropCanvas.processNewImage(image, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
-                }
+             //   }
 
-              });
+             // });
 
             }
 
@@ -238,6 +251,8 @@ angular.module('ngcrop').directive('cropImage',
               //remove orientationchange event listener and destroy the cropCanvas
               $window.removeEventListener('orientationchange',orientationListener, false);
               cropCanvas.destroy();
+              cvs.remove();
+              currentImg = null;
 
             });
 

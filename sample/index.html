@@ -21,7 +21,7 @@
     var app = angular.module('demo', ['ngcrop']);
     app
             .controller('ngcropDemoController', function($scope) {
-              $scope.origImageDataUrl= undefined;
+              $scope.accessor= {};
               $scope.isReadyForCrop = false;
               $scope.croppedImageDataUrl = undefined;
               $scope.cropViewActivated = false;
@@ -36,6 +36,13 @@
                   $scope.$apply(
                     function() {
                       $scope.origImageDataUrl = fileUrl;
+
+                        if($scope.accessor.processNewDataUrl){
+
+                            $scope.accessor.processNewDataUrl(fileUrl);
+
+                        }
+
                       $scope.isReadyForCrop = true;
                       $scope.cropViewActivated = true;
                     });
@@ -129,7 +136,7 @@
               selector-line-width="2"
               cropped-img-data="croppedImageDataUrl"
               post-canvas-img-process-callback="onCanvasImgProcess(canvasInfo)"
-              orig-image-data="origImageDataUrl"></crop-image>
+              accessor="accessor"></crop-image>
       <img data-ng-src="{{croppedImageDataUrl}}" data-ng-show="!isReadyForCrop && cropViewActivated" height="200px" width="200px">
     </div>
     <div class="row" data-ng-show="cropViewActivated" style="margin-top: 20px"></div>

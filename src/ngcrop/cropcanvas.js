@@ -8,7 +8,7 @@
 angular.module('ngcrop')
     .factory('CropCanvas',
     function CropCanvasFactory
-        (CropSelection,
+        (//CropSelection,
          ResultCanvas)
     {
 
@@ -28,7 +28,7 @@ angular.module('ngcrop')
         this.context = canvasElement[0].getContext('2d');
         this.resultCanvas = angular.isDefined(outputImageFormat) ? new ResultCanvas(outputImageFormat): new ResultCanvas('image/png');
         this.maxLength = maxLength;
-        this.cropSelector = new CropSelection(maxLength);
+       // this.cropSelector = new CropSelection(maxLength);
         this.selectorLineWidth = selectorLineWidth;
         this.selectorColor = selectorColor;
         this.imgScale = 1;
@@ -96,16 +96,16 @@ angular.module('ngcrop')
           this._maxLength = maxLength;
 
         },
-        get cropSelector() {
-
-          return this._cropSelector;
-
-        },
-        set cropSelector(cropSelector){
-
-          this._cropSelector = cropSelector;
-
-        },
+        //get cropSelector() {
+        //
+        //  return this._cropSelector;
+        //
+        //},
+        //set cropSelector(cropSelector){
+        //
+        //  this._cropSelector = cropSelector;
+        //
+        //},
         get selectorLineWidth() {
 
           return this._selectorLineWidth;
@@ -319,24 +319,24 @@ angular.module('ngcrop')
           this.lastX = this.currentX;
           this.lastY = this.currentY;
           this.isSelecting = true;
-          this.cropSelector.setCurrentCorner(this.currentX, this.currentY);
+          //this.cropSelector.setCurrentCorner(this.currentX, this.currentY);
 
-          //if in move zone which will move selector horizontally or vertically
-          //change cursor and set moveCorner to false
-          if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
-
-            this.canvas[0].style.cursor = 'move';
-            this.moveCorner = false;
-
-          }
-          else{
-
-            // we are in corner zone - find nearest corner and set moveCorner to true
-            this.canvas[0].style.cursor = 'crosshair';
-            this.corner = this.cropSelector.nearestCorner(this.currentX, this.currentY);
-            this.moveCorner = true;
-
-          }
+          ////if in move zone which will move selector horizontally or vertically
+          ////change cursor and set moveCorner to false
+          //if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
+          //
+          //  this.canvas[0].style.cursor = 'move';
+          //  this.moveCorner = false;
+          //
+          //}
+          //else{
+          //
+          //  // we are in corner zone - find nearest corner and set moveCorner to true
+          //  this.canvas[0].style.cursor = 'crosshair';
+          //  this.corner = this.cropSelector.nearestCorner(this.currentX, this.currentY);
+          //  this.moveCorner = true;
+          //
+          //}
 
         },
         /**
@@ -357,15 +357,15 @@ angular.module('ngcrop')
           //if we are not in isSelecting state yet, assess next move
           if(!this.isSelecting){
 
-            if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
-              this.canvas[0].style.cursor = 'move';
-            }
-            else{
-
-              this.canvas[0].style.cursor = 'crosshair';
-              this.moveCorner = true;
-
-            }
+            //if(this.cropSelector.isInMoveZone(this.currentX, this.currentY)){
+            //  this.canvas[0].style.cursor = 'move';
+            //}
+            //else{
+            //
+            //  this.canvas[0].style.cursor = 'crosshair';
+            //  this.moveCorner = true;
+            //
+            //}
 
           }else{
 
@@ -375,7 +375,7 @@ angular.module('ngcrop')
             var xdiff = this.currentX - this.lastX;
             var ydiff = this.currentY - this.lastY;
 
-            this.cropSelector.move(xdiff, ydiff, this.moveCorner, this.corner);
+          //  this.cropSelector.move(xdiff, ydiff, this.moveCorner, this.corner);
             this.lastX = this.currentX;
             this.lastY = this.currentY;
             this._drawCanvas();
@@ -392,7 +392,7 @@ angular.module('ngcrop')
           //turn selector guide variables off and output cropped image data from current selector location
           this.isSelecting = false;
           this.moveCorner = false;
-          this.cropSelector.resetCorner();
+       //   this.cropSelector.resetCorner();
           this._drawCanvas();
           this.canvas[0].style.cursor = 'default';
           this.getCroppedImageData();
@@ -413,35 +413,35 @@ angular.module('ngcrop')
           var y = 0;
           var drawWidth = canvasWidth;
           var drawHeight = canvasHeight;
-          var selectorMiddleX = this.cropSelector.x + (this.cropSelector.length/2);
-          var selectorMiddleY = this.cropSelector.y + (this.cropSelector.length/2);
-          var arrowLength = this.cropSelector.length / 4;
+          //var selectorMiddleX = this.cropSelector.x + (this.cropSelector.length/2);
+          //var selectorMiddleY = this.cropSelector.y + (this.cropSelector.length/2);
+          //var arrowLength = this.cropSelector.length / 4;
 
           this.context.drawImage(this.currentImg,x,y,drawWidth,drawHeight);
 
-          //then draw the rectangle
-          this.context.lineWidth = this.selectorLineWidth;
-          this.context.strokeStyle = this.selectorColor;
-          this.context.strokeRect(this.cropSelector.x,this.cropSelector.y,this.cropSelector.length,this.cropSelector.length);
-
-          this.context.beginPath();
-          this.context.lineWidth = 1;
-          this.context.moveTo(selectorMiddleX -4, selectorMiddleY);
-          this.context.lineTo(selectorMiddleX + 4, selectorMiddleY);
-          this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
-          this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
-          this.context.stroke();
-
-          //draw an error in the bottom lefthand corner
-          this.context.beginPath();
-          this.context.lineWidth = 2;
-          this.context.moveTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
-          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/2)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
-          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/2)));
-          this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
-          this.context.closePath();
-          this.context.fillStyle = this.selectorColor;
-          this.context.fill();
+          ////then draw the rectangle
+          //this.context.lineWidth = this.selectorLineWidth;
+          //this.context.strokeStyle = this.selectorColor;
+          //this.context.strokeRect(this.cropSelector.x,this.cropSelector.y,this.cropSelector.length,this.cropSelector.length);
+          //
+          //this.context.beginPath();
+          //this.context.lineWidth = 1;
+          //this.context.moveTo(selectorMiddleX -4, selectorMiddleY);
+          //this.context.lineTo(selectorMiddleX + 4, selectorMiddleY);
+          //this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
+          //this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
+          //this.context.stroke();
+          //
+          ////draw an error in the bottom lefthand corner
+          //this.context.beginPath();
+          //this.context.lineWidth = 2;
+          //this.context.moveTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          //this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/2)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          //this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/2)));
+          //this.context.lineTo(this.cropSelector.x + (this.cropSelector.length  - (arrowLength/4)), this.cropSelector.y + (this.cropSelector.length  - (arrowLength/4)));
+          //this.context.closePath();
+          //this.context.fillStyle = this.selectorColor;
+          //this.context.fill();
 
 
         },
@@ -451,10 +451,10 @@ angular.module('ngcrop')
          */
         getCroppedImageData: function(){
 
-          var x = this.cropSelector.x/this.imgScale;
-          var y = this.cropSelector.y/this.imgScale;
-          var len = this.cropSelector.length/this.imgScale;
-          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len, this.currentImgOrientation);
+          //var x = this.cropSelector.x/this.imgScale;
+          //var y = this.cropSelector.y/this.imgScale;
+          //var len = this.cropSelector.length/this.imgScale;
+          var data = this.resultCanvas.getDataUrl(this.currentImg, 0, 0,this.currentImg.length, this.currentImgOrientation);
 
           //callback draw data
           this.onCropResult(data);
@@ -482,9 +482,9 @@ angular.module('ngcrop')
 
           return {
 
-              x: this.cropSelector.x,
-              y: this.cropSelector.y,
-              length: this.cropSelector.length,
+              x: 0, //this.cropSelector.x,
+              y: 0,// this.cropSelector.y,
+              length:0,// this.cropSelector.length,
               scale: this.imgScale
 
             }
@@ -502,8 +502,8 @@ angular.module('ngcrop')
           this.canvas[0].width = (img.width * this.imgScale);
 
           //initialize cropSelector dimensions
-          this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
-              selectorStartX, selectorStartY, selectorStartLength);
+          //this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
+          //    selectorStartX, selectorStartY, selectorStartLength);
 
           //obtain bounds for the rectangle to assess mouse/touch event points
           var rect = this.canvas[0].getBoundingClientRect();
@@ -531,7 +531,6 @@ angular.module('ngcrop')
           this.canvas.off('touchmove',this._handleMove);
           this.canvas.off('touchleave',this._handleUp);
           this.canvas.off('touchend',this._handleUp);
-          this.canvas.remove();
 
         }
 
