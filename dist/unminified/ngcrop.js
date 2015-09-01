@@ -442,9 +442,6 @@ angular.module('ngcrop')
           this.context.lineWidth = 1;
           this.context.moveTo(selectorMiddleX -4, selectorMiddleY);
           this.context.lineTo(selectorMiddleX + 4, selectorMiddleY);
-          this.context.stroke();
-
-          this.context.beginPath();
           this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
           this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
           this.context.stroke();
@@ -947,7 +944,7 @@ angular.module('ngcrop').directive('cropImage',
           restrict: 'E',
           scope: {
 
-            origImage: '=',
+            origImageData: '=',
             croppedImgData: '=',
             maxImgDisplayLength: '=?',
             croppedImgFormat: '@?',
@@ -985,11 +982,13 @@ angular.module('ngcrop').directive('cropImage',
 
             }
 
+            var currentImg = null;
+
             //create a new instance of the CropCanvas
             var cropCanvas = new CropCanvas(cvs,maxCanvasLength, scope.selectorLineWidth, scope.selectorColor, scope.croppedImgFormat, onCropResult);
 
             //watch for changes on the main original image in the controller that contains the image (uploads of new images, etc.)
-            scope.$watch(function(scope) { return scope.origImage },
+            scope.$watch(function(scope) { return scope.origImageData },
               function(newImage) {
 
                 if(angular.isDefined(newImage)){
@@ -999,11 +998,25 @@ angular.module('ngcrop').directive('cropImage',
                     scope.startCanvasImgProcessCallback();
 
                   }
-                  properlyOrientImage(newImage);
 
+                  loadImage();
                 }
               }
             );
+
+            function loadImage(){
+
+              currentImg = new Image();
+
+              currentImg.onload = function(){
+
+                properlyOrientImage(this);
+
+              }
+
+              currentImg.src = scope.origImageData;
+
+            }
 
             /**
              * Function to call on orientation change on mobile/tablet devices
@@ -1014,7 +1027,9 @@ angular.module('ngcrop').directive('cropImage',
               //android returns wrong values so we must set a timeout so that it properly orients screen
               //otherwise wrong points for selector square are set and touch events act strange
               setTimeout(function(){
-                properlyOrientImage(scope.origImage);
+                if(currentImg !== null){
+                  properlyOrientImage(currentImg);
+                }
               },200);
 
 

@@ -21,32 +21,27 @@
     var app = angular.module('demo', ['ngcrop']);
     app
             .controller('ngcropDemoController', function($scope) {
-              $scope.origImageFile = undefined;
+              $scope.origImageDataUrl= undefined;
               $scope.isReadyForCrop = false;
               $scope.croppedImageDataUrl = undefined;
               $scope.cropViewActivated = false;
 
 
-              $scope.handleFileButtonClick = function(id){
+              $scope.updateImageView = function(fileUrl){
 
-                document.getElementById(id).click();
-
-              }
-
-              $scope.updateImageView = function(imageFileSrc){
-
-                var img = new Image();
-                img.onload = function () {
+                console.log('updating image view: ');
+//                var img = new Image();
+//                img.onload = function () {
 
                   $scope.$apply(
                     function() {
-                      $scope.origImageFile = img;
+                      $scope.origImageDataUrl = fileUrl;
                       $scope.isReadyForCrop = true;
                       $scope.cropViewActivated = true;
                     });
 
-                }
-                img.src = imageFileSrc;
+                //}
+                //img.src = imageFileSrc;
 
               }
 
@@ -80,38 +75,27 @@
                 }
                 ,link: function (scope, elem, attrs) {
 
-                  var reader = new FileReader();
-                  reader.onload = function (e) {
 
-                    if (scope.onFileUpload) {
-                      scope.onFileUpload({file: e.target.result});
-                    }
-                  }
+                  elem.on('change',readFile);
 
-                  elem.on('change', function () {
-                    var file = elem[0].files[0];
+                  function readFile(){
 
-                    if (!isValidFile(file)) {
+                      if (this.files && this.files[0]) {
 
-                      //show a modal
+                          //show a modal
+                          var reader = new FileReader();
+                          reader.onload = function (e) {
 
-                    } else {
+                              if (scope.onFileUpload) {
+                                  scope.onFileUpload({fileUrl: e.target.result});
+                              }
 
-                      reader.readAsDataURL(file);
-                    }
+                          }
 
-                  });
+                          reader.readAsDataURL(this.files[0]);
 
-                  /**
-                   * isValidFile - method to determine if a file is valid
-                   * @param file
-                   * @returns {boolean}
-                   */
-                  function isValidFile(file) {
-                    if (!file || !file.size || !file.type) {
-                      return false;
-                    }
-                    return true;
+                      }
+
                   }
 
                 }
@@ -119,7 +103,7 @@
               }
 
 
-            });
+            })
   </script>
 </head>
 <body ng-controller="ngcropDemoController">
@@ -127,16 +111,15 @@
   <h2 style="text-align: center">Drag corners to expand and/or collapse or click and drag center to move entire square</h2>
   <div>
     <div style="text-align: center">
-      <div data-ng-show="!cropViewActivated" class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5">
-        <input type="file" id="mainuploadfile" data-ng-show="false" accept="image/jpeg, image/JPG, image/JPEG, image/jpeg" filereader
-               on-file-upload="updateImageView(file)" capture="camera" image-file="image" />
-        <button
-                on-tap
-                class="btn btn-block"
-                data-ng-click="handleFileButtonClick('mainuploadfile')">
-          Upload a file
-        </button>
-      </div>
+      <!--<div data-ng-show="!cropViewActivated" class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5">-->
+        <!--&lt;!&ndash;<input type="file" id="mainuploadfile" accept="image/jpeg, image/JPG, image/JPEG, image/jpeg" filereader&ndash;&gt;-->
+               <!--&lt;!&ndash;on-file-upload="updateImageView(file)" capture="camera" />&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;<button&ndash;&gt;&ndash;&gt;-->
+                <!--&lt;!&ndash;&lt;!&ndash;on-tap&ndash;&gt;&ndash;&gt;-->
+                <!--&lt;!&ndash;&lt;!&ndash;class="btn btn-block" trigger-upload >&ndash;&gt;&ndash;&gt;-->
+          <!--&lt;!&ndash;&lt;!&ndash;Upload a file&ndash;&gt;&ndash;&gt;-->
+        <!--&lt;!&ndash;&lt;!&ndash;</button>&ndash;&gt;&ndash;&gt;-->
+      <!--</div>-->
       <crop-image
               data-ng-show="isReadyForCrop"
               data-ng-class="{'hideme' : !cropViewActivated}"
@@ -146,7 +129,7 @@
               selector-line-width="2"
               cropped-img-data="croppedImageDataUrl"
               post-canvas-img-process-callback="onCanvasImgProcess(canvasInfo)"
-              orig-image="origImageFile"></crop-image>
+              orig-image-data="origImageDataUrl"></crop-image>
       <img data-ng-src="{{croppedImageDataUrl}}" data-ng-show="!isReadyForCrop && cropViewActivated" height="200px" width="200px">
     </div>
     <div class="row" data-ng-show="cropViewActivated" style="margin-top: 20px"></div>
@@ -167,16 +150,15 @@
           Revert
         </button>
       </div>
-      <div class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5 margin10">
-        <input type="file" id="reupload" data-ng-show="false" accept="image/jpeg, image/JPG, image/JPEG, image/jpeg" filereader
-               on-file-upload="updateImageView(file)" capture="camera" image-file="image" />
-        <button
-                on-tap
-                class="btn btn-block"
-                data-ng-click="handleFileButtonClick('reupload')">
-          Reupload a file
-        </button>
-      </div>
+    </div>
+     <div class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5 margin10">
+          <input type="file" id="reupload" accept="image/*" capture="camera" filereader
+                 on-file-upload="updateImageView(fileUrl)"/>
+      <!--<button-->
+      <!--on-tap-->
+      <!--class="btn btn-block">-->
+      <!--Reupload a file-->
+      <!--</button>-->
     </div>
   </div>
 </div>

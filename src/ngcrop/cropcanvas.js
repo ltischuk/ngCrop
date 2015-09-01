@@ -428,9 +428,6 @@ angular.module('ngcrop')
           this.context.lineWidth = 1;
           this.context.moveTo(selectorMiddleX -4, selectorMiddleY);
           this.context.lineTo(selectorMiddleX + 4, selectorMiddleY);
-          this.context.stroke();
-
-          this.context.beginPath();
           this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
           this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
           this.context.stroke();
