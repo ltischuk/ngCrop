@@ -224,6 +224,7 @@ angular.module('ngcrop')
        */
       move : function(xMove,yMove, isCorner, cornerPosition){
 
+        console.log('move');
         if(isCorner){
 
           // assess the direction of the current move, then normalize the adjustments so we maintain
@@ -297,6 +298,7 @@ angular.module('ngcrop')
        */
       nearestCorner: function(pointX, pointY){
 
+        console.log('nearest corner');
         //assess the number of pixels from the given points
         var pxFromXLeft = Math.abs(pointX - this.x);
         var pxFromXRight = Math.abs(pointX - (this.x + this.length));
@@ -346,6 +348,7 @@ angular.module('ngcrop')
       },
       resetCorner: function(){
 
+        console.log('reset corner');
         this.currentCorner = 0;
 
       }

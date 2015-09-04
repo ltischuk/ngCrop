@@ -45,6 +45,9 @@ angular.module('ngcrop')
         this.cropSelector = new CropSelection(maxLength);
         this.selectorLineWidth = selectorLineWidth;
         this.selectorColor = selectorColor;
+        this.selectorStartX = 0;
+        this.selectorStartY = 0;
+        this.selectorStartLength = 0;
         this.imgScale = 1;
         this.isSelecting = false;
         this.moveCorner = false;
@@ -58,6 +61,7 @@ angular.module('ngcrop')
         this.currentImg = undefined;
         this.onCropResult = onCropResult;
         this._addEventHandlers();
+        this.postNewImageProcessingCallback = undefined;
 
       }
 
@@ -68,188 +72,7 @@ angular.module('ngcrop')
        **/
       CropCanvas.prototype = {
 
-        //accessor methods for variables
 
-        get canvas() {
-
-          return this._canvas;
-
-        },
-        set canvas(cvs){
-
-          this._canvas = cvs;
-
-        },
-        get context() {
-
-          return this._context;
-
-        },
-        set context(context){
-
-          this._context = context;
-
-        },
-        get resultCanvas() {
-
-          return this._resultCanvas;
-
-        },
-        set resultCanvas(resultCanvas){
-
-          this._resultCanvas = resultCanvas;
-
-        },
-        get maxLength() {
-
-          return this._maxLength;
-
-        },
-        set maxLength(maxLength){
-
-          this._maxLength = maxLength;
-
-        },
-        get cropSelector() {
-
-          return this._cropSelector;
-
-        },
-        set cropSelector(cropSelector){
-
-          this._cropSelector = cropSelector;
-
-        },
-        get selectorLineWidth() {
-
-          return this._selectorLineWidth;
-
-        },
-        set selectorLineWidth(selectorLineWidth){
-
-          this._selectorLineWidth = selectorLineWidth;
-
-        },
-        get selectorColor() {
-
-          return this._selectorColor;
-
-        },
-        set selectorColor(selectorColor){
-
-          this._selectorColor = selectorColor;
-
-        },
-        get imgScale() {
-
-          return this._imgScale;
-
-        },
-        set imgScale(imgScale){
-
-          this._imgScale = imgScale;
-
-        },
-        get isSelecting() {
-
-          return this._isSelecting;
-
-        },
-        set isSelecting(isSelecting){
-
-          this._isSelecting = isSelecting;
-
-        },
-        get moveCorner() {
-
-          return this._moveCorner;
-
-        },
-        set moveCorner(moveCorner){
-
-          this._moveCorner = moveCorner;
-
-        },
-        get lastX() {
-
-          return this._lastMouseX;
-
-        },
-        set lastX(lastMouseX){
-
-          this._lastMouseX = lastMouseX;
-
-        },
-        get lastY() {
-
-          return this._lastMouseY;
-
-        },
-        set lastY(lastMouseY){
-
-          this._lastMouseY = lastMouseY;
-
-        },
-        get currentX() {
-
-          return this._mouseX;
-
-        },
-        set currentX(mouseX){
-
-          this._mouseX = mouseX;
-
-        },
-        get currentY() {
-
-          return this._mouseY;
-
-        },
-        set currentY(mouseY){
-
-          this._mouseY = mouseY;
-
-        },
-        get corner() {
-
-          return this._corner;
-
-        },
-        set corner(corner){
-
-          this._corner = corner;
-
-        },
-        get canvasLeftPos(){
-
-          return this._canvasLeftPos;
-
-        },
-        set canvasLeftPos(left){
-
-          this._canvasLeftPos = left;
-
-        },
-        get canvasTopPos(){
-
-          return this._canvasTopPos;
-
-        },
-        set canvasTopPos(top){
-
-          this._canvasTopPos = top;
-
-        },
-        get currentImg(){
-
-          return this._currentImg;
-
-        },
-        set currentImg(img){
-
-          this._currentImg = img;
-
-        },
         /**
          * adds event handlers to the canvas for mouse events
          * @private
@@ -323,6 +146,7 @@ angular.module('ngcrop')
         _handleDown: function(e){
 
           e.preventDefault();
+          console.log('in handle down');
           var currentEvent = angular.isDefined(e.touches) ? e.touches[0] : e;
           var scrollX = document.body && document.body.scrollLeft !== null ? document.body.scrollLeft : document.documentElement.scrollLeft;
           var scrollY = document.body && document.body.scrollTop !== null ? document.body.scrollTop : document.documentElement.scrollTop;;
@@ -361,6 +185,7 @@ angular.module('ngcrop')
         _handleMove: function(e){
 
           e.preventDefault();
+          console.log('in handle move');
           var currentEvent = angular.isDefined(e.touches) ? e.touches[0] : e;
           var scrollX = document.body && document.body.scrollLeft !== null ? document.body.scrollLeft : document.documentElement.scrollLeft;
           var scrollY = document.body && document.body.scrollTop !== null ? document.body.scrollTop : document.documentElement.scrollTop;;
@@ -403,6 +228,7 @@ angular.module('ngcrop')
         _handleUp: function(e){
 
           e.preventDefault();
+          console.log('in handle up');
           //turn selector guide variables off and output cropped image data from current selector location
           this.isSelecting = false;
           this.moveCorner = false;
@@ -418,6 +244,7 @@ angular.module('ngcrop')
          */
         _drawCanvas: function(){
 
+          console.log('drawing canvas');
           //clear the selector rectangle first
           var canvasWidth = this.canvas[0].width;
           var canvasHeight = this.canvas[0].height;
@@ -442,9 +269,6 @@ angular.module('ngcrop')
           this.context.lineWidth = 1;
           this.context.moveTo(selectorMiddleX -4, selectorMiddleY);
           this.context.lineTo(selectorMiddleX + 4, selectorMiddleY);
-          this.context.stroke();
-
-          this.context.beginPath();
           this.context.moveTo(selectorMiddleX, selectorMiddleY-4);
           this.context.lineTo(selectorMiddleX, selectorMiddleY+4);
           this.context.stroke();
@@ -468,10 +292,11 @@ angular.module('ngcrop')
          */
         getCroppedImageData: function(){
 
+          console.log('get cropped data');
           var x = this.cropSelector.x/this.imgScale;
           var y = this.cropSelector.y/this.imgScale;
           var len = this.cropSelector.length/this.imgScale;
-          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len, this.currentImgOrientation);
+          var data = this.resultCanvas.getDataUrl(this.currentImg, x, y,len);
 
           //callback draw data
           this.onCropResult(data);
@@ -483,6 +308,7 @@ angular.module('ngcrop')
          */
         getCropCanvasInfo: function(){
 
+          console.log('get cropepd canvas info');
           return {
 
               width: this.canvas[0].width,
@@ -507,11 +333,112 @@ angular.module('ngcrop')
             }
 
         },
+        _handleImageOrientation : function(blobURL){
+
+          console.log('handle image orientation');
+          var postimgcallback = this._scaleCanvasAndInitializeSelector.bind(this);
+          var tempImg = new Image();
+
+          tempImg.onload = function(){
+
+
+            EXIF.getData(tempImg, function(){
+
+              var orientation = EXIF.getTag(tempImg, 'Orientation');
+              if(orientation === 6 || orientation === 8 || orientation === 3){
+
+                //must scale down the image as images over 2048 px will not draw on HTML5 canvas
+                var scale = Math.min ((2000 / tempImg.width),(2000/ tempImg.height), 1);
+                var tempCanvas = document.createElement('canvas');
+                var tempContext = tempCanvas.getContext('2d');
+                var height = (orientation == 6 || orientation == 8) ? tempImg.width * scale : tempImg.height * scale;
+                var width = (orientation == 6 || orientation == 8) ? tempImg.height * scale : tempImg.width * scale;
+                tempCanvas.height = height;
+                tempCanvas.width = width;
+                var x = 0;
+                var y = 0;
+
+                switch(orientation){
+
+                  case 3: {
+
+                    // 180 degrees rotate
+                    tempContext.translate(width/2,height/2);
+                    tempContext.rotate(Math.PI);
+                    //draw the image to the canvas
+                    x = -(height/2);
+                    y = -(width/2);
+                    break;
+
+                  }
+                  case 6: {
+
+                    // 90° rotate right
+                    tempContext.translate(width/2,height/2);
+                    tempContext.rotate(0.5 * Math.PI);
+                    //draw the image to the canvas
+                    x = -(height/2);
+                    y = -(width/2);
+                    break;
+
+                  }
+                  case 8: {
+
+                    // 90° rotate left
+                    tempContext.translate(width/2,height/2);
+                    tempContext.rotate(-0.5 * Math.PI);
+                    //draw the image to the canvas
+                    x = -(height/2);
+                    y = -(width/2);
+                    break;
+
+                  }
+
+                }
+
+
+                //draw the image
+                tempContext.drawImage(tempImg,x,y,height,width);
+                //grab the image data and save as a newAdjustedImage to pass to processNewImage
+                var source = tempCanvas.toDataURL();
+                var newAdjustedImage = new Image();
+                newAdjustedImage.onload = function(){
+
+                  postimgcallback(this);
+
+                }
+
+                newAdjustedImage.src = source;
+
+              }else{
+
+                postimgcallback(tempImg);
+              }
+
+            });
+
+          }
+
+          tempImg.src = blobURL;
+
+        },
+
         /**
          * Process a new image on the canvas and init variables for canvas and cropSelector
          * @param img
          */
-        processNewImage: function(img,selectorStartX, selectorStartY, selectorStartLength, finalCallback){
+        processNewImage: function(blobURL,selectorStartX, selectorStartY, selectorStartLength, callback){
+
+          console.log('process new image');
+          this.postNewImageProcessingCallback = callback;
+          this.selectorStartX = selectorStartX;
+          this.selectorStartY = selectorStartY;
+          this.selectorStartLength = selectorStartLength;
+          //handle the image orientation
+          this._handleImageOrientation(blobURL);
+
+        },
+        _scaleCanvasAndInitializeSelector : function(img){
 
           this.imgScale = Math.min ((this.maxLength / img.width),(this.maxLength/ img.height), 1);
 
@@ -520,7 +447,7 @@ angular.module('ngcrop')
 
           //initialize cropSelector dimensions
           this.cropSelector.initSelectorDimensions(this.canvas[0].width, this.canvas[0].height,
-              selectorStartX, selectorStartY, selectorStartLength);
+              this.selectorStartX, this.selectorStartY, this.selectorStartLength);
 
           //obtain bounds for the rectangle to assess mouse/touch event points
           var rect = this.canvas[0].getBoundingClientRect();
@@ -532,7 +459,7 @@ angular.module('ngcrop')
           this.currentImg = img;
           this._drawCanvas();
           this.getCroppedImageData();
-          finalCallback({canvasInfo: this.getCropCanvasInfo()})
+          this.postNewImageProcessingCallback({canvasInfo: this.getCropCanvasInfo()})
 
         },
         /**
@@ -784,6 +711,7 @@ angular.module('ngcrop')
        */
       move : function(xMove,yMove, isCorner, cornerPosition){
 
+        console.log('move');
         if(isCorner){
 
           // assess the direction of the current move, then normalize the adjustments so we maintain
@@ -857,6 +785,7 @@ angular.module('ngcrop')
        */
       nearestCorner: function(pointX, pointY){
 
+        console.log('nearest corner');
         //assess the number of pixels from the given points
         var pxFromXLeft = Math.abs(pointX - this.x);
         var pxFromXRight = Math.abs(pointX - (this.x + this.length));
@@ -906,6 +835,7 @@ angular.module('ngcrop')
       },
       resetCorner: function(){
 
+        console.log('reset corner');
         this.currentCorner = 0;
 
       }
@@ -923,7 +853,7 @@ angular.module('ngcrop')
  * Adds functionality to an HTML5 canvas element
  * restricted to elements
  * Receives options:
- * origImage: required input that is two-way bound to controller variable and is an Image object (the image to crop)
+ * origImageData: a data URL that is two-way bound to controller variable
  * maxImgDisplayLength: (optional) max length in pixels to confine the canvas to in the DOM
  * croppedImgData: (optional) required input that is two-way bound to controller variable and is a DataURL of cropped image data
  * addCanvasBorder: (optional) boolean value (true or false) to turn on/off a 2px black border around canvas
@@ -947,7 +877,7 @@ angular.module('ngcrop').directive('cropImage',
           restrict: 'E',
           scope: {
 
-            origImage: '=',
+            origImageFile: '=',
             croppedImgData: '=',
             maxImgDisplayLength: '=?',
             croppedImgFormat: '@?',
@@ -970,6 +900,9 @@ angular.module('ngcrop').directive('cropImage',
             scope.selectorLineWidth = angular.isDefined(attrs.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
             scope.croppedImgFormat = 'image/' + (angular.isDefined(attrs.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
 
+            var _URL = $window.URL || $window.webkitURL;
+            var blobURL = undefined;
+
             //maximum length of the canvas
             var maxCanvasLength = angular.isDefined(attrs.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
 
@@ -989,21 +922,29 @@ angular.module('ngcrop').directive('cropImage',
             var cropCanvas = new CropCanvas(cvs,maxCanvasLength, scope.selectorLineWidth, scope.selectorColor, scope.croppedImgFormat, onCropResult);
 
             //watch for changes on the main original image in the controller that contains the image (uploads of new images, etc.)
-            scope.$watch(function(scope) { return scope.origImage },
-              function(newImage) {
+            scope.$watch(function(scope) { return scope.origImageFile },
+              function(newFile) {
 
-                if(angular.isDefined(newImage)){
+                if(angular.isDefined(newFile)){
 
                   if(angular.isDefined(attrs.startCanvasImgProcessCallback) && angular.isFunction(scope.startCanvasImgProcessCallback)){
                     //call function in parent if required for starting to process image
                     scope.startCanvasImgProcessCallback();
 
                   }
-                  properlyOrientImage(newImage);
+
+                  if(angular.isDefined(blobURL)){
+
+                    _URL.revokeObjectURL(blobURL);
+
+                  }
+                  blobURL = _URL.createObjectURL(newFile);
+                  cropCanvas.processNewImage(blobURL, scope.selectorStartX, scope.selectorStartY, scope.selectorStartLength, scope.postCanvasImgProcessCallback);
 
                 }
               }
             );
+
 
             /**
              * Function to call on orientation change on mobile/tablet devices
@@ -1014,7 +955,7 @@ angular.module('ngcrop').directive('cropImage',
               //android returns wrong values so we must set a timeout so that it properly orients screen
               //otherwise wrong points for selector square are set and touch events act strange
               setTimeout(function(){
-                properlyOrientImage(scope.origImage);
+                cropCanvas.processNewImage(scope.origImageData,scope.selectorStartX, scope.selectorStartY, scope.selectorStartLength, scope.postCanvasImgProcessCallback);
               },200);
 
 
@@ -1037,97 +978,6 @@ angular.module('ngcrop').directive('cropImage',
                 scope.postSelectorMoveCallback({selectorInfo: cropCanvas.getCropCanvasSelectorInfo()});
 
               }
-
-            }
-
-            /**
-             * Orients the image - iPhone images are often stored oriented 90 degrees counterclockwise
-             * This function will check if the image is oriented in that way and if so creates a new image from
-             * a temporary canvas (and additionally scales the image to a max of 2000 pixels in width or height -
-             * to accommodate max drawing size on HTML5 canvases - then the new image that is created from getDataURL is
-             * saved on the scope as the origImage)
-             * @param image
-             */
-            function properlyOrientImage(image){
-
-
-              //get the EXIF data from the image and if orientation is 6, then rotate the image
-              EXIF.getData(image, function(){
-
-                var orientation = EXIF.getTag(image, 'Orientation');
-                console.log('orientation is ' + orientation);
-
-                if(orientation === 6 || orientation === 8 || orientation === 3){
-
-                  //must scale down the image as images over 2048 px will not draw on HTML5 canvas
-                  var scale = Math.min ((2000 / image.width),(2000/ image.height), 1);
-                  var tempCanvas = document.createElement('canvas');
-                  var tempContext = tempCanvas.getContext('2d');
-                  var height = (orientation == 6 || orientation == 8) ? image.width * scale : image.height * scale;
-                  var width = (orientation == 6 || orientation == 8) ? image.height * scale : image.width * scale;
-                  tempCanvas.height = height;
-                  tempCanvas.width = width;
-                  var x = 0;
-                  var y = 0;
-
-                  switch(orientation){
-
-                    case 3: {
-
-                      // 180 degrees rotate
-                      tempContext.translate(width/2,height/2);
-                      tempContext.rotate(Math.PI);
-                      //draw the image to the canvas
-                      x = -(height/2);
-                      y = -(width/2);
-                      break;
-
-                    }
-                    case 6: {
-
-                      // 90° rotate right
-                      tempContext.translate(width/2,height/2);
-                      tempContext.rotate(0.5 * Math.PI);
-                      //draw the image to the canvas
-                      x = -(height/2);
-                      y = -(width/2);
-                      break;
-
-                    }
-                    case 8: {
-
-                      // 90° rotate left
-                      tempContext.translate(width/2,height/2);
-                      tempContext.rotate(-0.5 * Math.PI);
-                      //draw the image to the canvas
-                      x = -(height/2);
-                      y = -(width/2);
-                      break;
-
-                    }
-
-                  }
-
-
-                  //draw the image
-                  tempContext.drawImage(image,x,y,height,width);
-0                  //grab the image data and save as a newImage to pass to processNewImage
-                  var source = tempCanvas.toDataURL();
-                  var newImage = new Image();
-                  newImage.onload = function(){
-
-                    cropCanvas.processNewImage(this, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
-
-                  }
-
-                  newImage.src = source;
-
-                }else{
-
-                  cropCanvas.processNewImage(image, scope.selectorStartX,scope.selectorStartY,scope.selectorStartLength, scope.postCanvasImgProcessCallback);
-                }
-
-              });
 
             }
 
@@ -1180,9 +1030,10 @@ angular.module('ngcrop')
          * @param len
          * @returns {*}
          */
-        getDataUrl: function (img, x, y, len, orientation) {
+        getDataUrl: function (img, x, y, len) {
 
           //draw the image to the canvas and pull display info
+          this.context.clearRect(0, 0,  this.resultCanvas.width, this.resultCanvas.height);
           this.resultCanvas.height = len;
           this.resultCanvas.width = len;
           var sX = x;
