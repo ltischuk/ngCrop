@@ -348,7 +348,6 @@ angular.module('ngcrop')
       },
       resetCorner: function(){
 
-        console.log('reset corner');
         this.currentCorner = 0;
 
       }

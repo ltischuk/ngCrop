@@ -78,23 +78,29 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(angular.isDefined(newFile)){
 
-                  if(angular.isDefined(attrs.startCanvasImgProcessCallback) && angular.isFunction(scope.startCanvasImgProcessCallback)){
-                    //call function in parent if required for starting to process image
-                    scope.startCanvasImgProcessCallback();
-
-                  }
-
-                  if(angular.isDefined(blobURL)){
-
-                    _URL.revokeObjectURL(blobURL);
-
-                  }
-                  blobURL = _URL.createObjectURL(newFile);
-                  cropCanvas.processNewImage(blobURL, scope.selectorStartX, scope.selectorStartY, scope.selectorStartLength, scope.postCanvasImgProcessCallback);
+                  handleFileChange(newFile);
 
                 }
               }
             );
+
+            function handleFileChange(newFile){
+
+              if(angular.isDefined(attrs.startCanvasImgProcessCallback) && angular.isFunction(scope.startCanvasImgProcessCallback)){
+                //call function in parent if required for starting to process image
+                scope.startCanvasImgProcessCallback();
+
+              }
+
+              if(angular.isDefined(blobURL)){
+
+                _URL.revokeObjectURL(blobURL);
+
+              }
+              blobURL = _URL.createObjectURL(newFile);
+              callProcessNewImage();
+
+            }
 
 
             /**
@@ -105,12 +111,17 @@ angular.module('ngcrop').directive('cropImage',
 
               //android returns wrong values so we must set a timeout so that it properly orients screen
               //otherwise wrong points for selector square are set and touch events act strange
-              setTimeout(function(){
-                cropCanvas.processNewImage(scope.origImageData,scope.selectorStartX, scope.selectorStartY, scope.selectorStartLength, scope.postCanvasImgProcessCallback);
-              },200);
+              setTimeout(callProcessNewImage,200);
 
 
             }
+
+            function callProcessNewImage(){
+
+              cropCanvas.processNewImage(blobURL,scope.selectorStartX, scope.selectorStartY, scope.selectorStartLength, scope.postCanvasImgProcessCallback);
+
+            }
+
 
 
             //add the orientationchange event listener
