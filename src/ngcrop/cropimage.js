@@ -4,9 +4,10 @@
  * Adds functionality to an HTML5 canvas element
  * restricted to elements
  * Receives options:
- * origImage: required input that is two-way bound to controller variable and is an Image object (the image to crop)
+ * origImageFileOrBlob: required input that is two-way bound to controller variable and is an File or Blob object
  * maxImgDisplayLength: (optional) max length in pixels to confine the canvas to in the DOM
  * croppedImgData: (optional) required input that is two-way bound to controller variable and is a DataURL of cropped image data
+ * croppedImgFormat: (format: jpeg, png for the cropped image)
  * addCanvasBorder: (optional) boolean value (true or false) to turn on/off a 2px black border around canvas
  * selectorColor: (optional)string hex value of color for the selector square
  * selectorLineWidth: (optional) number value of border width in pixels
@@ -27,8 +28,7 @@ angular.module('ngcrop').directive('cropImage',
       return {
           restrict: 'E',
           scope: {
-
-            origImage: '=',
+            origImageFileOrBlob: '=',
             croppedImgData: '=',
             maxImgDisplayLength: '=?',
             croppedImgFormat: '@?',
@@ -49,7 +49,7 @@ angular.module('ngcrop').directive('cropImage',
             // variables assess and set accordingly
             scope.selectorColor = angular.isDefined(attrs.selectorColor) ? scope.selectorColor : '#ff0000';
             scope.selectorLineWidth = angular.isDefined(attrs.selectorLineWidth) && angular.isNumber(Number(scope.selectorLineWidth)) ? Number(scope.selectorLineWidth) : 2;
-            scope.croppedImgFormat = 'image/' + (angular.isDefined(attrs.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'png');
+            scope.croppedImgFormat = 'image/' + (angular.isDefined(attrs.croppedImgFormat) && (scope.croppedImgFormat == 'jpeg' || scope.croppedImgFormat == 'png') ? scope.croppedImgFormat : 'jpeg');
 
             //maximum length of the canvas
             var maxCanvasLength = angular.isDefined(attrs.maxImgDisplayLength) && angular.isNumber(Number(scope.maxImgDisplayLength))? Number(scope.maxImgDisplayLength) : 300;
@@ -139,12 +139,10 @@ angular.module('ngcrop').directive('cropImage',
 
                 if(orientation === 6 || orientation === 8 || orientation === 3){
 
-                  //must scale down the image as images over 2048 px will not draw on HTML5 canvas
-                  var scale = Math.min ((2000 / image.width),(2000/ image.height), 1);
                   var tempCanvas = document.createElement('canvas');
                   var tempContext = tempCanvas.getContext('2d');
-                  var height = (orientation == 6 || orientation == 8) ? image.width * scale : image.height * scale;
-                  var width = (orientation == 6 || orientation == 8) ? image.height * scale : image.width * scale;
+                  var height = (orientation == 6 || orientation == 8) ? image.width : image.height;
+                  var width = (orientation == 6 || orientation == 8) ? image.height : image.width;
                   tempCanvas.height = height;
                   tempCanvas.width = width;
                   var x = 0;
@@ -192,7 +190,8 @@ angular.module('ngcrop').directive('cropImage',
                   //draw the image
                   tempContext.drawImage(image,x,y,height,width);
                  //grab the image data and save as a newImage to pass to processNewImage
-                  var source = tempCanvas.toDataURL();
+                  var source = tempCanvas.toDataURL(scope.croppedImgFormat);
+                  tempCanvas = tempContext = null;
                   var newImage = new Image();
                   newImage.onload = function(){
 

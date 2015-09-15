@@ -78,14 +78,6 @@
                 }
                 ,link: function (scope, elem, attrs) {
 
-                  var reader = new FileReader();
-                  reader.onload = function (e) {
-
-                    if (scope.onFileUpload) {
-                      scope.onFileUpload({file: e.target.result});
-                    }
-                  }
-
                   elem.on('change', function () {
                     var file = elem[0].files[0];
 
@@ -95,6 +87,13 @@
 
                     } else {
 
+                      var reader = new FileReader();
+                      reader.onload = function (e) {
+
+                        if (scope.onFileUpload) {
+                          scope.onFileUpload({file: e.target.result});
+                        }
+                      }
                       reader.readAsDataURL(file);
                     }
 
@@ -126,8 +125,8 @@
   <div>
     <div style="text-align: center">
       <div data-ng-show="!cropViewActivated" class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5">
-        <input type="file" id="mainuploadfile" data-ng-show="false" accept="image/jpeg, image/JPG, image/JPEG, image/jpeg" filereader
-               on-file-upload="updateImageView(file)" capture="camera" image-file="image" />
+        <input type="file" id="mainuploadfile" name="mainuploadfile" class="hideme" accept="image/jpeg, image/JPG, image/JPEG, image/jpeg" filereader
+               on-file-upload="updateImageView(file)" capture="camera" />
         <button
                 on-tap
                 class="btn btn-block"
@@ -163,6 +162,14 @@
                 class="btn btn-deep-red btn-block"
                 data-ng-click="revertCrop()">
           Revert
+        </button>
+      </div>
+      <div class="col-xs-6 col-xs-offset-3 col-sm-2 col-sm-offset-5">
+        <button
+                on-tap
+                class="btn btn-block"
+                data-ng-click="handleFileButtonClick('mainuploadfile')">
+          ReUpload a file
         </button>
       </div>
     </div>

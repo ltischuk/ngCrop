@@ -26,7 +26,7 @@ angular.module('ngcrop')
 
         this.canvas = canvasElement;
         this.context = canvasElement[0].getContext('2d');
-        this.resultCanvas = angular.isDefined(outputImageFormat) ? new ResultCanvas(outputImageFormat): new ResultCanvas('image/png');
+        this.resultCanvas = angular.isDefined(outputImageFormat) ? new ResultCanvas(outputImageFormat): new ResultCanvas('image/jpeg');
         this.maxLength = maxLength;
         this.cropSelector = new CropSelection(maxLength);
         this.selectorLineWidth = selectorLineWidth;
@@ -534,6 +534,8 @@ angular.module('ngcrop')
           this.canvas.off('touchmove',this._handleMove);
           this.canvas.off('touchleave',this._handleUp);
           this.canvas.off('touchend',this._handleUp);
+          this.cropSelector = null;
+          this.currentImg = null;
           this.canvas.remove();
 
         }
